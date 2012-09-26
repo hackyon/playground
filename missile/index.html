@@ -99,7 +99,7 @@ var Missile = function(paper, target, params) {
   // Line of sight is the line between the missile and the target
   this.lineOfSight = paper.path(Path.LINE(this.x, this.y, target.x, target.y));
   this.lineOfSight.attr("stroke", "#fff");
-  this.lineOfSight.attr("stroke-width", 3);
+  this.lineOfSight.attr("stroke-width", 0);
   this.lineOfSight.attr("stroke-opacity", 0.1);
 
   // Nothing but <3
@@ -194,6 +194,29 @@ window.onload = function() {
     missiles.push(missile);
   }
   target.sprite.toFront();
+ 
+  var h1 = document.getElementById("space");
+  var blink = false;
+  document.body.onkeyup = function(e) {
+    var e = e || event;
+    if (e.keyCode === 76) { // L
+      var width = missiles[0].lineOfSight.attr("stroke-width");
+      width = (width == 0)? 2 : 0;
+      for (var i = 0; i < missiles.length; i++) {
+        missiles[i].lineOfSight.attr("stroke-width", width);
+      }
+    } else if (e.keyCode == 66) { // B
+      blink = !blink;
+      h1.className = h1.className.replace(' glow', '');
+    } else if (e.keyCode == 82) { // R
+      blink = false;
+      if (h1.className.indexOf('glow') !== -1) {
+        h1.className = h1.className.replace(' glow', '');
+      } else {
+        h1.className += ' glow';
+      }
+    }
+  };
 
   // Animation frames from browser
   // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -208,6 +231,23 @@ window.onload = function() {
              };
   })();
 
+  // Blinking
+  var blinker = function() {
+    if (!blink) {
+      h1.style.color = "#222";
+      h1.style.opacity = 1;
+      return;
+    }
+    
+    if (Math.random() < 0.2) {
+      h1.style.color = "#F3F315";
+      h1.style.opacity = 0.3;
+    } else {
+      h1.style.color = "#222";
+      h1.style.opacity = 1;
+    }
+  };
+
   var frame = function() {
     window.requestAnimFrame(frame);
 
@@ -216,15 +256,7 @@ window.onload = function() {
       missiles[i].frame();
     }
 
-    // Blink the h1
-    /*var h1 = document.getElementById("space");
-    if (Math.random() < 0.1) {
-      h1.style.color = "#F3F315";
-      h1.style.opacity = 0.3;
-    } else {
-      h1.style.color = "#222";
-      h1.style.opacity = 1;
-    }*/
+    blinker();
   };
   frame();
 };
@@ -298,11 +330,13 @@ a:hover {
   text-decoration: none;
 }
 .red {
-  color: #f00;
+  color: #911;
   font-size: 16px;
   font-weight: bold;
   text-transform: uppercase;
-  opacity: 0.7;
+}
+.glow {
+  text-shadow: 0 0 3px #FF3333;
 }
 </style>
 </head>
