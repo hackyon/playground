@@ -199,22 +199,14 @@ window.onload = function() {
   var blink = false;
   document.body.onkeyup = function(e) {
     var e = e || event;
-    if (e.keyCode === 76) { // L
+    if (e.keyCode === 83) { // S - Line of Sight
       var width = missiles[0].lineOfSight.attr("stroke-width");
       width = (width == 0)? 2 : 0;
       for (var i = 0; i < missiles.length; i++) {
         missiles[i].lineOfSight.attr("stroke-width", width);
       }
-    } else if (e.keyCode == 66) { // B
+    } else if (e.keyCode == 76) { // L - LOVE (Blink)
       blink = !blink;
-      h1.className = h1.className.replace(' glow', '');
-    } else if (e.keyCode == 82) { // R
-      blink = false;
-      if (h1.className.indexOf('glow') !== -1) {
-        h1.className = h1.className.replace(' glow', '');
-      } else {
-        h1.className += ' glow';
-      }
     }
   };
 
@@ -233,18 +225,12 @@ window.onload = function() {
 
   // Blinking
   var blinker = function() {
-    if (!blink) {
-      h1.style.color = "#222";
-      h1.style.opacity = 1;
-      return;
-    }
+    if (!blink) return;
     
-    if (Math.random() < 0.2) {
-      h1.style.color = "#F3F315";
-      h1.style.opacity = 0.3;
+    if (Math.random() < 0.3) {
+      h1.className += ' glow';
     } else {
-      h1.style.color = "#222";
-      h1.style.opacity = 1;
+      h1.className = h1.className.replace(' glow', '');
     }
   };
 
@@ -275,6 +261,7 @@ Path.GLOBE = Raphael.transformPath("M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0
 
 </script>
 
+<link rel="shortcut icon" href="favicon.ico">
 <link href='http://fonts.googleapis.com/css?family=Monoton' rel='stylesheet' type='text/css'>
 <style>
 html, body { 
@@ -300,6 +287,7 @@ html, body {
   font-weight: 400;
   margin: 0;
   padding: 0;
+  height: 100px;
   color: #222;
 }
 #watermark p {
@@ -307,6 +295,15 @@ html, body {
   padding: 0;
   line-height: 18px;
   width: 200px;
+}
+#watermark .red {
+  color: #f00;
+  font-weight: normal;
+  text-transform: uppercase;
+}
+#watermark .glow {
+  color: #FF3333;
+  text-shadow: 0 0 15px #FF3333;
 }
 #about {
   position: absolute;
@@ -328,15 +325,6 @@ a, a:active, a:link, a:visited {
 a:hover {
   color: #777;
   text-decoration: none;
-}
-.red {
-  color: #911;
-  font-size: 16px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-.glow {
-  text-shadow: 0 0 3px #FF3333;
 }
 </style>
 </head>
