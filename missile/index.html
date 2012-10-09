@@ -53,7 +53,8 @@ Target.prototype.frame = function() {
     this.angle += Math.PI/120;
     this.radius = (this.a * this.b) / Math.sqrt(Math.pow(this.b * Math.cos(this.angle), 2) + Math.pow(this.a * Math.sin(this.angle), 2));
   } else {
-    // Equation for infinity symbol accepts -PI/4 to PI/4
+    // The Lemniscate of Bernoulli (equation for the graph of the infinity 
+    // symbol) accepts -PI/4 to PI/4
     this.angle += Math.PI/240;
     if (this.angle > Math.PI/4) {
       this.angle  -= Math.PI/2;
