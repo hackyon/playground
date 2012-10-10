@@ -170,13 +170,21 @@ Missile.prototype.frame = function() {
 /**
  * Loads the target and missiles!
  */
-window.onload = function() {
+var init = window.onload = function() {
   var pageWidth  = document.width;
   var pageHeight = document.height;
 
   if (pageWidth == undefined) {
     pageWidth  = document.body.clientWidth;
     pageHeight = document.body.clientHeight;
+  }
+
+  // Weird: The browser returns 0 for the document width and height if
+  // the page is loaded in a new tab (at least in Chrome). If this happens,
+  // then we can just keep try again in a little bit.
+  if (pageWidth == 0 || pageHeight == 0) {
+    setTimeout(init, 100);
+    return;
   }
 
   var paper = Raphael(0, 0, pageWidth, pageHeight);
