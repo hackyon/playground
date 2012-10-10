@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <title>Mapping with Mercator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=false">
 <script src="jquery.min.js" type="text/javascript"></script>
 <script src="jquery-ui.min.js" type="text/javascript"></script>
 
@@ -195,8 +196,13 @@ html, body {
   color: #FFFFFF;
   background: #CC3E3E; 
 }
+#about {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
 #about h1 {
-  margin: 0;
+  margin: 0 0 10px 0;
   padding: 3px 5px;
   background: rgba(255, 255, 255, 0.3); 
   display: inline-block;
@@ -204,20 +210,15 @@ html, body {
   font-family: 'Raleway Dots', Arial, sans-serif;
   font-size: 30px;
   text-transform: uppercase;
-  position: fixed;
-  bottom: 120px;
-  left: 20px;
 }
 #about p {
   background: rgba(255, 255, 255, 0.3); 
   margin: 0;
   padding: 7px;
-  width: 600px;
+  max-width: 600px;
+  width: 90%;
   color: #222;
   line-height: 16px;
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
 }
 a, a:link, a:active {
   color: #0B5FA5;
@@ -271,7 +272,7 @@ svg g {
 <div id="about">
   <h1>Mapping with Mercator</h1>
   <p>
-    Translates latitude and longitude into the corresponding x and y coordinates on a Mercator projection of the world, using the <a href="http://en.wikipedia.org/wiki/Gudermannian_function" target="_blank">Gudermannian function</a>. Read the <a href="#">blog post for this experiment</a>. If you are looking for mapping libraries, you should check out the <a href="https://github.com/mbostock/d3/wiki/Geo-Projections" target="_blank">d3 Geo Projections</a>.<br/>
+    Translates latitude and longitude into the corresponding x and y coordinates on a Mercator projection of the world, using the <a href="http://en.wikipedia.org/wiki/Gudermannian_function" target="_blank">Gudermannian function</a>. Read the <a href="http://www.badassdon.com/2012/09/fun-with-missiles-and-maps" target="_blank">blog post for this experiment</a>. If you are looking for mapping libraries, you should check out the <a href="https://github.com/mbostock/d3/wiki/Geo-Projections" target="_blank">d3 Geo Projections</a>.<br/>
     <br/>
     The map is from <a href="http://en.wikipedia.org/wiki/File:Mercator_projection_SW.jpg" target="_blank">Wikipedia</a> and is distributed under the Creative Commons license.
   </p>
