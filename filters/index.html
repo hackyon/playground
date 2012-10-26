@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>7 | An Experiment of Image Filters</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: "Times New Roman", Times, serif;
+  min-width: 960px;
+}
+canvas { 
+  display: block;
+  margin: 0 auto;
+}
+
+a {
+  text-decoration: none;
+  color: #777;
+}
+a:visited {
+  color: #999;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+#seven {
+  margin-bottom: 100px;
+}
+#about {
+  width: 677px;
+  font-style: italic;
+  font-size: 17px;
+  line-height: 28px;
+  text-align: center;
+  color: #222;
+  margin: 0 auto;
+  margin-bottom: 70px;
+}
+#about .border {
+  border-top: 1px solid #ddd;
+  margin: 15px auto 0 auto;
+  width: 330px;
+}
+footer {
+  width: 960px;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 50px;
+  text-align: right;
+  color: #222;
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 100px;
+}
+footer img {
+  vertical-align: middle;
+  margin: 0 2px;
+  border: 0;
+}
+
+a.grow:hover {
+  text-decoration: none;
+}
+a.grow img {
+  -webkit-transition: all 0.1s ease-in-out;
+  -moz-transition: all 0.1s ease-in-out;
+  transition: all 0.1s ease-in-out;
+}
+a.grow:hover img {
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  transform: scale(1.1);
+}
+</style>
+</head>
+<body>
+  <canvas id="seven" width="960" height="500"></canvas>
+
+  <div id="about">Experimenting with some of the more common imaging filters and manipulations. The filters are applied by rendering images onto the HTML5 canvas and forwarding the image data through a filter pipeline. Want to know more? Read the <a href="http://www.badassdon.com/">blog post</a>.<div class="border"></div></div>
+
+  <ul id="photos">
+    <li><canvas id="photo1" width="300" height="300" /></li>
+    <li><canvas id="photo2" width="300" height="300" /></li>
+    <li><canvas id="photo3" width="300" height="300" /></li>
+  </ul>
+  
+  <footer>
+    With <img src="images/heart.png" width="14" height="13" /> from <a href="http://www.badassdon.com" class="grow"><img src="images/badassdon.png" width="35" height="35" /></a>
+  </footer>
+
+
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script type="text/javascript" src="jquery.hoverscroll.js"></script>
+
+  <script type="text/javascript" src="filters.js"></script>
+  <script type="text/javascript">
+  // TODO: Pick images
+  // TODO: More filters
+  // Implement Levels and Curves
+  // How to transform to HSV?
+  // Hue Filter
+  // Bilateral Filter, Blur Filter
+
+  $(document).ready(function() {
+    var seven = document.getElementById('seven');
+
+    // Filters are namespaced under the ImageFilterContext
+    var context = new ImageFilterContext();
+   
+    var source1 = context.createSource();
+    source1.url = 'images/pier.jpg';
+    
+    var source2 = context.createSource();
+    source2.url = 'images/pier.jpg';
+
+    var source = context.createLayer();
+    source.width = seven.width;
+    source.height = seven.height;
+
+    var display = context.createLayer();
+    display.canvas = seven;
+
+    source1.connect(source, 0, -10);
+    source2.connect(source, 100, 100);
+    //source.connect(display);
+
+    var canvasMask = context.createCanvasMask();
+    canvasMask.canvas = (function() {
+      // Draw "7" on a new canvas to use as the mask
+      var canvas = document.createElement('canvas');
+      canvas.setAttribute('width',  seven.width);
+      canvas.setAttribute('height', seven.height);
+
+      var context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.font = "bold 600px sans-serif";
+      context.fillText('7', 350, 500);
+      return canvas;
+    })();
+
+    var sat = context.createSaturationFilter();
+    sat.value = 0;
+
+    source.connect(canvasMask);
+    canvasMask.connect(display);
+    //contrast.connect(display);
+    //canvasMask.connect(display);
+    //source.render();
+    source1.render();
+    source2.render();
+
+
+    // Enable the HoverScroll for images
+    $('#photos').hoverScroll();
+    $(window).resize(function() {
+      $('#photos').resize();
+    });
+  });
+  </script>
+</body>
+</html>

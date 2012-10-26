@@ -1,0 +1,2 @@
+  scope.ImageFilterContext = Context;
+})(window);
