@@ -3,6 +3,9 @@
  *
  * Scrolls a horizontal list on hover. The amount of scroll is computed
  * based on the x position of the mouse with respect to width of the list.
+ *
+ * Distributed under the terms of the MIT License
+ * Copyright (c) 2012 Donald Lau (badassdon)
  */
 (function($) {
   // TODO: Mobile support
