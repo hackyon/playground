@@ -85,6 +85,10 @@ a.grow:hover img {
     <li><canvas id="photo1" width="300" height="300" /></li>
     <li><canvas id="photo2" width="300" height="300" /></li>
     <li><canvas id="photo3" width="300" height="300" /></li>
+    <li><canvas id="photo4" width="300" height="300" /></li>
+    <li><canvas id="photo5" width="300" height="300" /></li>
+    <li><canvas id="photo6" width="300" height="300" /></li>
+    <li><canvas id="photo7" width="300" height="300" /></li>
   </ul>
   
   <footer>
@@ -105,52 +109,79 @@ a.grow:hover img {
   // Bilateral Filter, Blur Filter
 
   $(document).ready(function() {
-    var seven = document.getElementById('seven');
-
     // Filters are namespaced under the ImageFilterContext
     var context = new ImageFilterContext();
-   
-    var source1 = context.createSource();
-    source1.url = 'images/pier.jpg';
-    
-    var source2 = context.createSource();
-    source2.url = 'images/pier.jpg';
+ 
+    // The canvas with the big "7"
+    (function() {
+      var seven = document.getElementById('seven');
 
-    var source = context.createLayer();
-    source.width = seven.width;
-    source.height = seven.height;
+      var source1 = context.createSource();
+      source1.url = 'images/pier.jpg';
+      
+      var source2 = context.createSource();
+      source2.url = 'images/pier.jpg';
 
-    var display = context.createLayer();
-    display.canvas = seven;
+      var source = context.createLayer();
+      source.width = seven.width;
+      source.height = seven.height;
 
-    source1.connect(source, 0, -10);
-    source2.connect(source, 100, 100);
-    //source.connect(display);
+      var display = context.createLayer();
+      display.canvas = seven;
 
-    var canvasMask = context.createCanvasMask();
-    canvasMask.canvas = (function() {
-      // Draw "7" on a new canvas to use as the mask
-      var canvas = document.createElement('canvas');
-      canvas.setAttribute('width',  seven.width);
-      canvas.setAttribute('height', seven.height);
+      source1.connect(source, 0, -10);
+      source2.connect(source, 100, 100);
+      //source.connect(display);
 
-      var context = canvas.getContext('2d');
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.font = "bold 600px sans-serif";
-      context.fillText('7', 350, 500);
-      return canvas;
+      var canvasMask = context.createCanvasMask();
+      canvasMask.canvas = (function() {
+        // Draw "7" on a new canvas to use as the mask
+        var canvas = document.createElement('canvas');
+        canvas.setAttribute('width',  seven.width);
+        canvas.setAttribute('height', seven.height);
+
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = "bold 600px sans-serif";
+        context.fillText('7', 350, 500);
+        return canvas;
+      })();
+
+      var sat = context.createSaturationFilter();
+      sat.value = 0;
+
+      source.connect(canvasMask);
+      canvasMask.connect(display);
+      //contrast.connect(display);
+      //canvasMask.connect(display);
+      //source.render();
+      source1.render();
+      source2.render();
     })();
 
-    var sat = context.createSaturationFilter();
-    sat.value = 0;
+    // The 7 photos on canvas
+    (function() {
+      var sources = [];
+      var destinations = [];
+      $('#photos').find('canvas').each(function(i) {
+        var source = context.createSource();
+        source.url = 'images/pier.jpg';
+        sources.push(source);
 
-    source.connect(canvasMask);
-    canvasMask.connect(display);
-    //contrast.connect(display);
-    //canvasMask.connect(display);
-    //source.render();
-    source1.render();
-    source2.render();
+        var destination = context.createLayer();
+        destination.canvas = this;
+        destinations.push(destination);
+      });
+
+      sources[0].connect(destinations[0], -150, -150);
+      
+      for (var i = 1; i < sources.length; i++) {
+        sources[i].connect(destinations[i], -100, -100);
+      }
+      for (var i = 0; i < sources.length; i++) {
+        sources[i].render();
+      }
+    })();
 
 
     // Enable the HoverScroll for images

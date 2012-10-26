@@ -18,9 +18,9 @@ module.exports = function(grunt) {
               '<indent:src/layer.js>',
               '<indent:src/mask.js>',
               '<indent:src/saturation.js>',
-              '<indent:src/sepia.js>',
               '<indent:src/brightness.js>',
               '<indent:src/contrast.js>',
+              '<indent:src/sepia.js>',
               'src/tail.js'],
         dest: 'filters.js'
       }
