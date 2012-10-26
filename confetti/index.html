@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Confetti | Particles and A Little Gravity</title>
+<link rel="shortcut icon" href="favicon.ico" />
+
+<link href='http://fonts.googleapis.com/css?family=Dancing+Script:700' rel='stylesheet' type='text/css'>
+<style>
+html, body { 
+  margin: 0; 
+  padding: 0; 
+  font-family: 'Arial','Helvetica',sans-serif;
+}
+
+.explode { 
+  width: 100%;
+  height: 100%;
+  overflow: hidden; 
+  position: absolute;
+  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.87);
+  z-index: 1;
+}
+.explode .source {
+  width: 500px;
+  padding: 20px 20px 40px 20px;
+  position: relative;
+  top: 25%;
+  margin: 0 auto;
+  background: #fff;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  border: 8px solid #111;
+  text-align: center;
+  z-index: 3;
+}
+
+h1 {
+  padding: 0;
+  margin: 0;
+  color: #111;
+  font-size: 72px;
+  font-weight: 700;
+  font-family: 'Dancing Script', sans-serif;
+}
+.tagline {
+  display: block;
+  font-size: 14px;
+  color: #ccc;
+  margin: 0 0 30px 0;
+  text-transform: uppercase;
+  text-align: center;
+}
+p {
+  margin: 15px 0 0 0;
+  padding: 0;
+  color: #444;
+  text-align: left;
+}
+
+a {
+  color: #666;
+}
+a:visited {
+  color: #999;
+}
+a:hover {
+  text-decoration: none;
+}
+
+.star {
+  width: 16px;
+  height: 16px;
+  background: url(star.png) center center no-repeat;
+  position: absolute;
+  z-index: 2;
+}
+</style>
+</head>
+<body>
+
+<div class="explode">
+  <div class="source">
+    <h1>Confetti</h1>
+    <p class="tagline">Particles and a Little Gravity</p>
+    <p>Experimenting with simple particles under the effects of gravity. I'm just trying to recreate an "exploding stars" effect that a friend showed me sometime ago.</p>
+    <p>The <a href="http://www.github.com/badassdon/playground/confetti">source</a> is available on github. Read the <a href="http://www.badassdon.com/">blog post</a>.</p>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+function extend(target, obj) {
+  for (var key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      target[key] = obj[key];
+    }
+  }
+};
+
+// Array Remove - By John Resig (MIT Licensed)
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
+
+/**
+ * Particle controls the motion of the particle, but the rendering
+ * is performed by the callback.
+ */
+var Particle = function(init, renderer) {
+  extend(this, { x: 0,  y: 0, angle: 0, vx: 0, vy: 0, va: 0, mass: 1 });
+  extend(this, init);
+
+  this.clean = false;
+
+  this.renderer = renderer;
+  this.renderer.call(this);
+};
+Particle.GRAVITY  = 9.8/60;
+Particle.TERMINAL = -50;
+Particle.prototype.onFrame = function(normalize) {
+  this.y += this.vy * normalize;
+  this.x += this.vx * normalize;
+
+  this.vy += Particle.GRAVITY * this.mass * normalize;
+  this.vy = Math.max(Particle.TERMINAL, this.vy);
+
+  this.angle += this.va * normalize;
+
+  this.renderer.call(this);
+};
+
+/**
+ * Generate particles and bootstrap the animation.
+ */
+window.onload = function() {
+  var n = 75;
+  var particles = [];
+
+  var explode = document.getElementsByClassName('explode')[0];
+  var source  = document.getElementsByClassName('source')[0];
+
+  var padding = 100;
+  var bounds = {
+    x1: explode.offsetLeft - padding,
+    x2: explode.offsetLeft + explode.clientWidth + padding,
+    y : explode.offsetTop + explode.clientHeight + padding 
+  };
+
+  for (var i = 0; i < n; i++) {
+    var star = document.createElement('div');
+    star.className += 'star';
+    explode.appendChild(star);
+
+    var offsetX = 150 * Math.random() - 75;
+    var offsetY = 60;
+
+    var init = {
+      x: source.offsetLeft + source.clientWidth/2 + offsetX,
+      y: source.offsetTop + offsetY,
+      vx: (Math.random() * 16) - 8,
+      vy: -(9 + Math.random() * 4),
+      va: 2 + Math.random() * 6,
+      mass: 2 + Math.random() * 2
+    };
+
+    var front = (Math.random() > 0.5);
+    if (front) {
+      star.style.zIndex = 4;
+    }
+
+    var renderer = (function(star) {
+      return function() {
+        star.style.top  = this.y + "px";
+        star.style.left = this.x + "px";
+
+        // CSS3 transform breaks Safari
+        // var transform = "translate(" + this.x + "px," + this.y + "px)";
+        var transform = "rotate(" + this.angle + "deg)";
+        star.style.webkitTransform = transform;
+        star.style.MozTransform    = transform;
+        star.style.OTransform      = transform;
+        star.style.transform  = transform;
+
+        // Rudimentary cleaning
+        if (this.x < bounds.x1 || this.x > bounds.x2 || this.y > bounds.y) {
+          star.parentNode.removeChild(star);
+          this.clean = true;
+        }
+      };
+    })(star);
+
+    var particle = new Particle(init, renderer);
+    particles.push(particle);
+  }
+
+  // Start animation
+  // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+  window.requestAnimFrame = (function(){
+      return window.requestAnimationFrame       || 
+             window.webkitRequestAnimationFrame || 
+             window.mozRequestAnimationFrame    || 
+             window.oRequestAnimationFrame      || 
+             window.msRequestAnimationFrame     || 
+             function (callback) {
+               window.setTimeout(callback, 1000 / 60); // Default to 60fps
+             };
+  })();
+
+  var timer = +new Date();
+  var frame = function() {
+    window.requestAnimFrame(frame);
+
+    // Normalize motion with respect to 60fps
+    var time = +new Date();
+    var elapsed = time - timer;
+    var normalize = elapsed / (1000/60);
+    timer = time;
+
+    for (var i = 0; i < n; i++) {
+      if (!particles[i]) continue;
+      
+      if (!particles[i].clean) {
+        particles[i].onFrame(normalize);
+      } else {
+        particles[i] = null;
+      }
+    }
+  };
+  frame();
+};
+</script>
+</body>
+</html>
