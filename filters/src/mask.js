@@ -28,7 +28,9 @@ CanvasMask.prototype.render = function(imageData) {
 
       // The mask is based on the alpha value 
       var j = (targetX + targetY * imageData.width) * 4;
-      imageData.data[j+3] = mask.data[i+3];
+      if (imageData.data[j+3] !== 0) {
+        imageData.data[j+3] = mask.data[i+3];
+      }
     }
   }
   this._next(imageData);

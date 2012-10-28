@@ -31,6 +31,7 @@
       this.connect  = connect;
       this.render   = render;
       this._next    = render;
+      this.clamp    = clamp;
       return this;
     };
   })();

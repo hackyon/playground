@@ -101,12 +101,8 @@ a.grow:hover img {
 
   <script type="text/javascript" src="filters.js"></script>
   <script type="text/javascript">
-  // TODO: Pick images
-  // TODO: More filters
-  // Implement Levels and Curves
-  // How to transform to HSV?
-  // Hue Filter
-  // Bilateral Filter, Blur Filter
+  // TODO: Moar filters (Levels, Curves, Hue, Blur, Bilateral)
+  // TODO: Transform HSV
 
   $(document).ready(function() {
     // Filters are namespaced under the ImageFilterContext
@@ -116,22 +112,24 @@ a.grow:hover img {
     (function() {
       var seven = document.getElementById('seven');
 
-      var source1 = context.createSource();
-      source1.url = 'images/pier.jpg';
-      
-      var source2 = context.createSource();
-      source2.url = 'images/pier.jpg';
+      var sources = [];
+      var n = 3;
+      for (var i = 0; i < n; i++) {
+        sources.push(context.createSource());
+      }
 
-      var source = context.createLayer();
-      source.width = seven.width;
-      source.height = seven.height;
+      var compose = context.createLayer();
+      compose.width  = seven.width;
+      compose.height = seven.height;
 
-      var display = context.createLayer();
-      display.canvas = seven;
+      sources[0].url = 'images/statue.png';
+      sources[0].connect(compose, 240, 0);
 
-      source1.connect(source, 0, -10);
-      source2.connect(source, 100, 100);
-      //source.connect(display);
+      sources[1].url = 'images/door.png';
+      sources[1].connect(compose, 545, 0);
+
+      sources[2].url = 'images/oxford.png';
+      sources[2].connect(compose, 390, 305);
 
       var canvasMask = context.createCanvasMask();
       canvasMask.canvas = (function() {
@@ -146,17 +144,17 @@ a.grow:hover img {
         context.fillText('7', 350, 500);
         return canvas;
       })();
+      compose.connect(canvasMask);
 
-      var sat = context.createSaturationFilter();
-      sat.value = 0;
+      var display = context.createLayer();
+      display.canvas = seven;
 
-      source.connect(canvasMask);
       canvasMask.connect(display);
-      //contrast.connect(display);
-      //canvasMask.connect(display);
-      //source.render();
-      source1.render();
-      source2.render();
+
+      // Render images
+      for (var i = 0; i < n; i++) {
+        sources[i].render();
+      }
     })();
 
     // The 7 photos on canvas
@@ -165,7 +163,6 @@ a.grow:hover img {
       var destinations = [];
       $('#photos').find('canvas').each(function(i) {
         var source = context.createSource();
-        source.url = 'images/pier.jpg';
         sources.push(source);
 
         var destination = context.createLayer();
@@ -173,11 +170,41 @@ a.grow:hover img {
         destinations.push(destination);
       });
 
-      sources[0].connect(destinations[0], -150, -150);
+      sources[0].url = 'images/door.png';
+      sources[0].connect(destinations[0]); 
+
+      sources[1].url = 'images/door.png';
+      sources[1].connect(destinations[1]); 
+
+      sources[2].url = 'images/door.png';
+      sources[2].connect(destinations[2]); 
+
+      sources[3].url = 'images/statue.png';
+      sources[3].connect(destinations[3]); 
+
+      sources[4].url = 'images/statue.png';
+      sources[4].connect(destinations[4]); 
+
+      // Brightness and Contrast Filter
+      var contrast = context.createContrastFilter();
+      contrast.multiplier = 1.5;
+
+      var brightness = context.createBrightnessFilter();
+      brightness.value = 40;
+
+      sources[5].url = 'images/oxford.png';
+      sources[5].connect(contrast);
+      contrast.connect(brightness);
+      brightness.connect(destinations[5]);
+
+      // Saturation Filter
+      var saturation = context.createSaturationFilter();
+      saturation.value = -0.8;
+
+      sources[6].url = 'images/oxford.png';
+      sources[6].connect(saturation);
+      saturation.connect(destinations[6]);
       
-      for (var i = 1; i < sources.length; i++) {
-        sources[i].connect(destinations[i], -100, -100);
-      }
       for (var i = 0; i < sources.length; i++) {
         sources[i].render();
       }
@@ -185,7 +212,10 @@ a.grow:hover img {
 
 
     // Enable the HoverScroll for images
-    $('#photos').hoverScroll();
+    $('#photos').hoverScroll({ 
+      margin: 5,
+      padding: 100
+    });
     $(window).resize(function() {
       $('#photos').resize();
     });
