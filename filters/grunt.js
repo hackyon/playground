@@ -13,7 +13,10 @@ module.exports = function(grunt) {
     },
     concat: {
       dist: {
-        src: ['<banner:meta.banner>', 'src/head.js', 
+        src: ['<banner:meta.banner>', 
+              'src/head.js', 
+              '<indent:src/node.js>', 
+              '<indent:src/cmyk.js>', 
               '<indent:src/source.js>',
               '<indent:src/layer.js>',
               '<indent:src/mask.js>',
@@ -36,7 +39,7 @@ module.exports = function(grunt) {
     },
     watch: {
       files: 'src/*.js',
-      tasks: 'concat lint min'
+      tasks: 'concat min'
     },
     uglify: {}
   });
