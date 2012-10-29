@@ -1,8 +1,8 @@
 /**
- * Conversion between RGB and CYMK. Functions are available as mixins.
+ * Conversion between RGB and CYMK.
  */
 var CMYKConverter = (function() {
-  function convertToCMYK(imageData) {
+  function convertRGBtoCMYK(imageData) {
     // The alpha is ignored
     var buffer = new ArrayBuffer(imageData.data.length * 4);
     var cmyk   = new Float32Array(buffer);
@@ -23,7 +23,7 @@ var CMYKConverter = (function() {
     }
     return cmyk;
   }
-  function convertToRGB(cmyk, imageData) {
+  function convertCMYKtoRGB(cmyk, imageData) {
     for (var i = 0; i < cmyk.length; i += 4) {
       var c = cmyk[i]  /100;
       var m = cmyk[i+1]/100;
@@ -38,7 +38,7 @@ var CMYKConverter = (function() {
   }
 
   return function() {
-    this.convertToCMYK = convertToCMYK;
-    this.convertToRGB  = convertToRGB;
+    this.convertRGBtoCMYK = convertRGBtoCMYK;
+    this.convertCMYKtoRGB = convertCMYKtoRGB;
   };
 })();

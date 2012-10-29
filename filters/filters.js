@@ -44,6 +44,113 @@
   })();
   
   /**
+   * Conversion between RGB and CYMK.
+   */
+  var CMYKConverter = (function() {
+    function convertRGBtoCMYK(imageData) {
+      // The alpha is ignored
+      var buffer = new ArrayBuffer(imageData.data.length * 4);
+      var cmyk   = new Float32Array(buffer);
+      for (var i = 0; i < imageData.data.length; i += 4) {
+        var r = imageData.data[i];
+        var g = imageData.data[i+1];
+        var b = imageData.data[i+2];
+  
+        var c = 1 - (r/255);
+        var m = 1 - (g/255);
+        var y = 1 - (b/255);
+  
+        var k = Math.min(c, m, y);
+        cmyk[i  ] = (c-k)/(1-k)*100;
+        cmyk[i+1] = (m-k)/(1-k)*100;
+        cmyk[i+2] = (y-k)/(1-k)*100;
+        cmyk[i+3] = k*100; 
+      }
+      return cmyk;
+    }
+    function convertCMYKtoRGB(cmyk, imageData) {
+      for (var i = 0; i < cmyk.length; i += 4) {
+        var c = cmyk[i]  /100;
+        var m = cmyk[i+1]/100;
+        var y = cmyk[i+2]/100;
+        var k = cmyk[i+3]/100;
+  
+        imageData.data[i]   = Math.round(255*(1-((c*(1-k))+k)));
+        imageData.data[i+1] = Math.round(255*(1-((m*(1-k))+k)));
+        imageData.data[i+2] = Math.round(255*(1-((y*(1-k))+k)));
+      }
+      return imageData;
+    }
+  
+    return function() {
+      this.convertRGBtoCMYK = convertRGBtoCMYK;
+      this.convertCMYKtoRGB = convertCMYKtoRGB;
+    };
+  })();
+  
+  /**
+   * Conversion between RGB and YIQ.
+   */
+  var YIQConverter = (function() {
+    function convertRGBtoYIQ(imageData) {
+      // The alpha is ignored
+      var buffer = new ArrayBuffer(imageData.data.length*3);
+      var yiq    = new Float32Array(buffer);
+      for (var j=0, k=0; j < imageData.data.length; j+=4, k+=3) {
+        var r = imageData.data[j];
+        var g = imageData.data[j+1];
+        var b = imageData.data[j+2];
+  
+        yiq[k]   = 0.299*r + 0.587*g + 0.114*b;
+        yiq[k+1] = 0.596*r - 0.274*g - 0.321*b;
+        yiq[k+2] = 0.211*r - 0.523*g + 0.311*b;
+      }
+      return yiq;
+    }
+    function convertYIQtoRGB(yiq, imageData) {
+      for (var j=0, k=0; k < yiq.length; j+=4, k+=3) {
+        var y = yiq[k];
+        var i = yiq[k+1];
+        var q = yiq[k+2];
+  
+        imageData.data[j]   = Math.round(y + 0.956*i + 0.621*q); 
+        imageData.data[j+1] = Math.round(y - 0.272*i - 0.647*q);
+        imageData.data[j+2] = Math.round(y - 1.107*i + 1.705*q);
+      }
+      return imageData;
+    }
+    function shiftHue(yiq, rad) {
+      for (var j = 0; j < yiq.length; j += 3) {
+        var i = yiq[j+1];
+        var q = yiq[j+2];
+        yiq[j+1] = i * Math.cos(rad) - q * Math.sin(rad);
+        yiq[j+2] = i * Math.sin(rad) + q * Math.cos(rad);
+      }
+    }
+    function shiftSaturation(yiq, saturation) {
+      for (var j = 0; j < yiq.length; j += 3) {
+        yiq[j+1] = yiq[j+1] * saturation;
+        yiq[j+2] = yiq[j+2] * saturation;
+      }
+    }
+    function shiftValue(yiq, value) {
+      for (var j = 0; j < yiq.length; j += 3) {
+        yiq[j]   = yiq[j  ] * value;
+        yiq[j+1] = yiq[j+1] * value;
+        yiq[j+2] = yiq[j+2] * value;
+      }
+    }
+  
+    return function() {
+      this.convertRGBtoYIQ = convertRGBtoYIQ;
+      this.convertYIQtoRGB = convertYIQtoRGB;
+      this.YIQshiftHue = shiftHue;
+      this.YIQshiftSaturation = shiftSaturation;
+      this.YIQshiftValue = shiftValue;
+    };
+  })();
+  
+  /**
    * Data source for an image.
    */
   var Source = function() { 
@@ -71,51 +178,6 @@
   Context.prototype.createSource = function() {
     return new Source();
   };
-  
-  /**
-   * Conversion between RGB and CYMK. Functions are available as mixins.
-   */
-  var CMYKConverter = (function() {
-    function convertToCMYK(imageData) {
-      // The alpha is ignored
-      var buffer = new ArrayBuffer(imageData.data.length * 4);
-      var cmyk   = new Float32Array(buffer);
-      for (var i = 0; i < imageData.data.length; i += 4) {
-        var r = imageData.data[i];
-        var g = imageData.data[i+1];
-        var b = imageData.data[i+2];
-  
-        var c = 1 - (r/255);
-        var m = 1 - (g/255);
-        var y = 1 - (b/255);
-  
-        var k = Math.min(c, m, y);
-        cmyk[i  ] = (c-k)/(1-k)*100;
-        cmyk[i+1] = (m-k)/(1-k)*100;
-        cmyk[i+2] = (y-k)/(1-k)*100;
-        cmyk[i+3] = k*100; 
-      }
-      return cmyk;
-    }
-    function convertToRGB(cmyk, imageData) {
-      for (var i = 0; i < cmyk.length; i += 4) {
-        var c = cmyk[i]  /100;
-        var m = cmyk[i+1]/100;
-        var y = cmyk[i+2]/100;
-        var k = cmyk[i+3]/100;
-  
-        imageData.data[i]   = Math.round(255*(1-((c*(1-k))+k)));
-        imageData.data[i+1] = Math.round(255*(1-((m*(1-k))+k)));
-        imageData.data[i+2] = Math.round(255*(1-((y*(1-k))+k)));
-      }
-      return imageData;
-    }
-  
-    return function() {
-      this.convertToCMYK = convertToCMYK;
-      this.convertToRGB  = convertToRGB;
-    };
-  })();
   
   /**
    * Layer to compose and position multiple sources.
@@ -230,6 +292,23 @@
   
   Context.prototype.createSaturationFilter = function() {
     return new SaturationFilter();
+  };
+  
+  var HueFilter = function() {
+    this.shift = 0;
+  };
+  Node.call(HueFilter.prototype);
+  YIQConverter.call(HueFilter.prototype);
+  
+  HueFilter.prototype.render = function(imageData) {
+    var yiq = this.convertRGBtoYIQ(imageData);
+    this.YIQshiftHue(yiq, this.shift);
+    imageData = this.convertYIQtoRGB(yiq, imageData);
+    this._next(imageData);
+  };
+  
+  Context.prototype.createHueFilter = function() {
+    return new HueFilter();
   };
   
   var BrightnessFilter = function() {

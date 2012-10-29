@@ -102,7 +102,6 @@ a.grow:hover img {
   <script type="text/javascript" src="filters.js"></script>
   <script type="text/javascript">
   // TODO: Moar filters (Levels, Curves, Hue, Blur, Bilateral)
-  // TODO: Transform HSV
 
   $(document).ready(function() {
     // Filters are namespaced under the ImageFilterContext
@@ -171,7 +170,7 @@ a.grow:hover img {
       });
 
       sources[0].url = 'images/door.png';
-      sources[0].connect(destinations[0]); 
+      sources[0].connect(destinations[0]);
 
       sources[1].url = 'images/door.png';
       sources[1].connect(destinations[1]); 
@@ -182,8 +181,13 @@ a.grow:hover img {
       sources[3].url = 'images/statue.png';
       sources[3].connect(destinations[3]); 
 
+      // Hue Filter
+      var hue = context.createHueFilter();
+      hue.shift = Math.PI;
+
       sources[4].url = 'images/statue.png';
-      sources[4].connect(destinations[4]); 
+      sources[4].connect(hue);
+      hue.connect(destinations[4]);
 
       // Brightness and Contrast Filter
       var contrast = context.createContrastFilter();
