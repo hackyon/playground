@@ -1,3 +1,6 @@
+/**
+ * Applis a Sepia filter over the image to give it a brownish tint.
+ */
 var SepiaFilter = function() {
   this.depth = 8;
   this.intensity = 18;

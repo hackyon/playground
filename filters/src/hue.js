@@ -1,13 +1,15 @@
+/**
+ * Shifts the hue of the image.
+ */
 var HueFilter = function() {
   this.shift = 0;
 };
 Node.call(HueFilter.prototype);
-YIQConverter.call(HueFilter.prototype);
 
 HueFilter.prototype.render = function(imageData) {
-  var yiq = this.convertRGBtoYIQ(imageData);
-  this.YIQshiftHue(yiq, this.shift);
-  imageData = this.convertYIQtoRGB(yiq, imageData);
+  var yiq = YIQ.convertRGBtoYIQ(imageData);
+  YIQ.shiftHue(yiq, this.shift);
+  imageData = YIQ.convertYIQtoRGB(yiq, imageData);
   this._next(imageData);
 };
 

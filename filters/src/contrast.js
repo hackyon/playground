@@ -1,3 +1,6 @@
+/**
+ * Shift the contrast of the image.
+ */
 var ContrastFilter = function() {
   this.multiplier = 1;
 };

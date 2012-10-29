@@ -1,3 +1,6 @@
+/**
+ * Shift the brightness of the image.
+ */
 var BrightnessFilter = function() {
   this.value = 0;
 };
