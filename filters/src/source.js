@@ -17,7 +17,7 @@ Source.prototype.render = function() {
     var context = canvas.getContext('2d');
     context.drawImage(image, 0, 0);
     var imageData = context.getImageData(0, 0, image.width, image.height);
-
+    
     self._next(imageData);
   };
   image.src = self.url;

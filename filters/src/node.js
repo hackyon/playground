@@ -16,15 +16,11 @@ var Node = (function() {
       node.render(imageData, this);
     }
   }
-  function clamp(color) {
-    return Math.max(Math.min(color, 255), 0);
-  }
 
   return function() {
     this.connect  = connect;
     this.render   = render;
     this._next    = render;
-    this.clamp    = clamp;
     return this;
   };
 })();

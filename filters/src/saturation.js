@@ -15,9 +15,9 @@ SaturationFilter.prototype.render = function(imageData) {
 
     var luminosity = this.compute(r, g, b);
 
-    imageData.data[i]   = this.clamp(r + (r - luminosity) * this.value);
-    imageData.data[i+1] = this.clamp(g + (g - luminosity) * this.value);
-    imageData.data[i+2] = this.clamp(b + (b - luminosity) * this.value);
+    imageData.data[i]   = r + (r - luminosity) * this.value;
+    imageData.data[i+1] = g + (g - luminosity) * this.value;
+    imageData.data[i+2] = b + (b - luminosity) * this.value;
   }
 
   this._next(imageData);

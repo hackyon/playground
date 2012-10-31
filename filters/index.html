@@ -96,12 +96,13 @@ a.grow:hover img {
   </footer>
 
 
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>-->
+  <script type="text/javascript" src="lib/jquery-1.8.2.min.js"></script>
   <script type="text/javascript" src="lib/jquery.hoverscroll.js"></script>
 
   <script type="text/javascript" src="filters.js"></script>
   <script type="text/javascript">
-  // TODO: Moar filters (Levels, Curves, Blur, Bilateral)
+  // TODO: Levels, Curves, Blur, Bilateral, Rotation, Resize
 
   $(document).ready(function() {
     // Filters are namespaced under the ImageFilterContext
@@ -175,8 +176,12 @@ a.grow:hover img {
       sources[1].url = 'images/door.png';
       sources[1].connect(destinations[1]); 
 
+      // Blur Filter
+      var blur = context.createBlurFilter();
+
       sources[2].url = 'images/door.png';
-      sources[2].connect(destinations[2]); 
+      sources[2].connect(blur);
+      blur.connect(destinations[2]);
 
       sources[3].url = 'images/statue.png';
       sources[3].connect(destinations[3]); 
