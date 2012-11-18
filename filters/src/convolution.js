@@ -21,11 +21,11 @@ Convolution.apply = function(kernel, imageData) {
 
       for (var row = 0; row < rows; row++) {
         var yRow = y + row - Math.floor(rows/2);
-        if (yRow > 0 && (yRow < imageData.height-1)) {
+        if (yRow >= 0 && (yRow < imageData.height)) {
 
           for (var col = 0; col < cols; col++) {
             var xCol = x + col - Math.floor(cols/2);
-            if (xCol > 0 && (xCol < imageData.width-1)) {
+            if (xCol >= 0 && (xCol < imageData.width)) {
 
               var j = (xCol + yRow * imageData.width) * 4;
               weight += kernel[row][col];

@@ -216,11 +216,11 @@
   
         for (var row = 0; row < rows; row++) {
           var yRow = y + row - Math.floor(rows/2);
-          if (yRow > 0 && (yRow < imageData.height-1)) {
+          if (yRow >= 0 && (yRow < imageData.height)) {
   
             for (var col = 0; col < cols; col++) {
               var xCol = x + col - Math.floor(cols/2);
-              if (xCol > 0 && (xCol < imageData.width-1)) {
+              if (xCol >= 0 && (xCol < imageData.width)) {
   
                 var j = (xCol + yRow * imageData.width) * 4;
                 weight += kernel[row][col];
@@ -358,6 +358,44 @@
   };
   Node.call(BlurFilter.prototype);
   
+  BlurFilter.prototype.useBasicBlur = function() {
+    this.kernel = [[ 1, 1, 1 ], [ 1, 1, 1 ], [ 1, 1, 1 ]];
+  };
+  
+  BlurFilter.prototype.useBasicSoften = function() {
+    this.kernel = [[ 1, 1, 1 ], [ 1, 10, 1 ], [ 1, 1, 1 ]];
+  };
+  
+  BlurFilter.prototype.useBasicSharpen = function() {
+    this.kernel = [[ 0, -1, 0 ], [ -1, 6, -1 ], [ 0, -1, 0 ]];
+  };
+  
+  BlurFilter.prototype.useBoxBlur = function(radius) {
+    // Potential simulation of the bokeh effect
+    this.kernel = [];
+    var diameter = 2 * radius + 1;
+    for (var i = 0; i < diameter; i++) {
+      this.kernel[i] = [];
+      for (var j = 0; j < diameter; j++) {
+        var distance = Math.sqrt(Math.pow(i-radius, 2) + Math.pow(j-radius, 2));
+        this.kernel[i][j] = (Math.round(distance) < radius) ? 1 : 0;
+      }
+    }
+  };
+  
+  BlurFilter.prototype.useGaussianBlur = function(radius, sigma) {
+    this.kernel = [];
+    var diameter = 2 * radius + 1;
+    for (var i = 0; i < diameter; i++) {
+      this.kernel[i] = [];
+      for (var j = 0; j < diameter; j++) {
+        this.kernel[i][j] = 1/(2*Math.PI*sigma*sigma) * Math.exp(
+          -(Math.pow(i-radius, 2) + Math.pow(j-radius, 2)) / 
+          (2*sigma*sigma));
+      }
+    }
+  };
+  
   BlurFilter.prototype.render = function(imageData) {
     Convolution.apply(this.kernel, imageData);
     this._next(imageData);
@@ -433,16 +471,6 @@
       return a.input - b.input;
     });
   };
-  
-  // TODO: Implement Blur (3h)
-  // TODO: Implement Rotation (2h)
-  // TODO: Implement Resize (2h)
-  
-  // TODO: Implement Matrix (2h)
-  // TODO: Implement Gaussian Reduction (1h)
-  // TODO: Implement Cubic Splines (2h)
-  
-  // TODO: Implement other filters
   
   CurvesFilter.prototype.render = function(imageData) {
     var meta = null;
