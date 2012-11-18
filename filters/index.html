@@ -64,15 +64,10 @@ footer img {
 a.grow:hover {
   text-decoration: none;
 }
-a.grow img {
-  -webkit-transition: all 0.1s ease-in-out;
-  -moz-transition: all 0.1s ease-in-out;
-  transition: all 0.1s ease-in-out;
-}
 a.grow:hover img {
-  -webkit-transform: scale(1.1);
-  -moz-transform: scale(1.1);
-  transform: scale(1.1);
+  -webkit-transform: scale(1.05);
+  -moz-transform: scale(1.05);
+  transform: scale(1.05);
 }
 </style>
 </head>
@@ -102,7 +97,7 @@ a.grow:hover img {
 
   <script type="text/javascript" src="filters.js"></script>
   <script type="text/javascript">
-  // TODO: Levels, Curves, Blur, Bilateral, Rotation, Resize
+  // TODO: Rotation, Resize, Levels & Curves (require Matrix, Gaussian reduciton, Cubc splines), Gaussian Blur
 
   $(document).ready(function() {
     // Filters are namespaced under the ImageFilterContext

@@ -20,6 +20,7 @@ module.exports = function(grunt) {
               '<indent:src/histogram.js>', 
               '<indent:src/cmyk.js>', 
               '<indent:src/yiq.js>', 
+              '<indent:src/convolution.js>', 
               '<indent:src/source.js>',
               '<indent:src/layer.js>',
               '<indent:src/mask.js>',
