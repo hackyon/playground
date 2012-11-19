@@ -168,17 +168,22 @@ a.grow:hover img {
       sources[0].url = 'images/door.png';
       sources[0].connect(destinations[0]);
 
+      // Pixelate Filter
+      var pixelate = context.createPixelateFilter();
+      pixelate.connect(destinations[1]);
+
       sources[1].url = 'images/door.png';
-      sources[1].connect(destinations[1]); 
+      sources[1].connect(pixelate);
+
+      sources[2].url = 'images/door.png';
+      sources[2].connect(destinations[2]);
 
       // Blur Filter
       var blur = context.createBlurFilter();
-
-      sources[2].url = 'images/door.png';
-      sources[2].connect(blur);
-      blur.connect(destinations[2]);
+      blur.useBoxBlur(3);
 
       sources[3].url = 'images/statue.png';
+      sources[3].connect(blur);
       sources[3].connect(destinations[3]); 
 
       // Hue Filter

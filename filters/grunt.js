@@ -24,6 +24,7 @@ module.exports = function(grunt) {
               '<indent:src/source.js>',
               '<indent:src/layer.js>',
               '<indent:src/mask.js>',
+              '<indent:src/pixelate.js>',
               '<indent:src/blur.js>',
               '<indent:src/saturation.js>',
               '<indent:src/curves.js>', 
