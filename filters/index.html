@@ -97,7 +97,7 @@ a.grow:hover img {
 
   <script type="text/javascript" src="filters.js"></script>
   <script type="text/javascript">
-  // TODO: Levels & Curves (require Matrix, Gaussian reduciton, Cubc splines), Rotation, Resize (with Dithering)
+  // TODO: Common Photograph Filters (ex. Sepia), Rotation, Resize (with Dithering)
 
   $(document).ready(function() {
     // Filters are namespaced under the ImageFilterContext
@@ -175,8 +175,13 @@ a.grow:hover img {
       sources[1].url = 'images/door.png';
       sources[1].connect(pixelate);
 
+      // Curves Filter
+      var curves = context.createCurvesFilter();
+      curves.useLevels(100, 125, 150);
+      curves.connect(destinations[2]);
+
       sources[2].url = 'images/door.png';
-      sources[2].connect(destinations[2]);
+      sources[2].connect(curves);
 
       // Blur Filter
       var blur = context.createBlurFilter();

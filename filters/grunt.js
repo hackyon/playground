@@ -18,6 +18,7 @@ module.exports = function(grunt) {
               '<indent:src/node.js>', 
               '<indent:src/light.js>', 
               '<indent:src/histogram.js>', 
+              '<indent:src/matrix.js>', 
               '<indent:src/cmyk.js>', 
               '<indent:src/yiq.js>', 
               '<indent:src/convolution.js>', 

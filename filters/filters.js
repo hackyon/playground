@@ -96,6 +96,121 @@
   };
   
   /**
+   * Matrix comuptations.
+   */
+  var Matrix = function() {
+  };
+  
+  Matrix.add = function(matrix1, matrix2) {
+    var matrix = [];
+    for (var row = 0; row < matrix1.length; row++) {
+      matrix[row] = [];
+      for (var col = 0; col < matrix1[row].length; col++) {
+        matrix[row][col] = matrix1[row][col] + matrix2[row][col];
+      }
+    }
+    return matrix;
+  };
+  
+  Matrix.multiply = function(matrix1, matrix2) {
+    var matrix = [];
+    for (var row1 = 0; row1 < matrix1.length; row1++) {
+      matrix[row1] = [];
+      for (var col2 = 0; col2 < matrix2[0].length; col2++) {
+        matrix[row1][col2] = 0;
+  
+        for (var i = 0; i < matrix1[row1].length; i++) {
+          matrix[row1][col2] += matrix1[row1][i] * matrix2[i][col2];
+        }
+      }
+    }
+    return matrix;
+  };
+  
+  Matrix.gaussianJordanElimination = function(augmented) {
+    var size = augmented.length;
+    var i = 0, row = 0, col = 0, factor = 0;
+    for (i = 0; i < size; i++) {
+      for (row = i+1; row < size; row++) {
+        factor = augmented[row][i] / augmented[i][i];
+        for (col = i; col < augmented[row].length; col++) {
+          augmented[row][col] = augmented[row][col] - factor * augmented[i][col]; 
+        }
+      }
+    }
+    for (i = 0; i < size; i++) {
+      factor = augmented[i][i];
+      for (col = i; col < augmented[i].length; col++) {
+        augmented[i][col] = augmented[i][col] / factor;
+      }
+    }
+    for (i = size-1; i >= 0; i--) {
+      for (row = i-1; row >= 0; row--) {
+        factor = augmented[row][i];
+        for (col = i; col < augmented[row].length; col++) {
+          augmented[row][col] = augmented[row][col] - factor * augmented[i][col]; 
+        }
+      }
+    }
+    return augmented;
+  };
+  
+  Matrix.augment = function(matrix1, matrix2) {
+    var augmented = [];
+    var row = 0, col = 0;
+    for (row = 0; row < matrix1.length; row++) {
+      augmented[row] = [];
+      for (col = 0; col < matrix1[row].length; col++) {
+        augmented[row].push(matrix1[row][col]);
+      }
+      for (col = 0; col < matrix2[row].length; col++) {
+        augmented[row].push(matrix2[row][col]);
+      }
+    }
+    return augmented;
+  };
+  
+  Matrix.inverse = function(matrix) {
+    var size = matrix.length;
+    var row = 0, col = 0;
+    var identity = [];
+    for (row = 0; row < size; row++) {
+      identity[row] = [];
+      for (col = 0; col < size; col++) {
+        if (row === col) {
+          identity[row][col] = 1;
+        } else {
+          identity[row][col] = 0;
+        }
+      }
+    }
+    var augmented = Matrix.augment(matrix, identity);
+    Matrix.gaussianJordanElimination(augmented);
+  
+    var inverse = [];
+    for (row = 0; row < size; row++) {
+      inverse[row] = [];
+      for (col = 0; col < size; col++) {
+        inverse[row][col] = augmented[row][size+col];
+      }
+    }
+    return inverse;
+  };
+  
+  Matrix.solveLinearEquations = function(coefficients, vector) {
+    var augmented = Matrix.augment(coefficients, vector);
+    Matrix.gaussianJordanElimination(augmented);
+    
+    var solution = [];
+    var col = augmented[0].length-1;
+    for (var row = 0; row < augmented.length; row++) {
+      solution[row] = augmented[row][col];
+    }
+    return solution;
+  };
+  
+  
+  /**
    * Conversion between RGB and CYMK.
    */
   var CMYK = function() {
@@ -482,7 +597,6 @@
   var CurvesFilter = function() {
     this.precompute = null;
     this.curve = null;
-    this.useLinearCurve(0, 127, 255);
   };
   Node.call(CurvesFilter.prototype);
   
@@ -492,16 +606,11 @@
    * is assumed that shadows < midtones < highlights.
    */
   CurvesFilter.prototype.useLevels = function(shadow, midtone, highlight) {
-    this.precompute = null;
-    this.curve = function(value) {
-      if (value <= shadow) {
-        return 0;
-      }
-      if (value >= highlight) {
-        return 255;
-      }
-  
-    };
+    this.useCubicSplineCurve([
+      { input: shadow   , output: 0   },
+      { input: midtone  , output: 127 },
+      { input: highlight, output: 255 }
+    ]);
   };
   
   /**
@@ -510,8 +619,122 @@
   CurvesFilter.prototype.useCubicSplineCurve = function(points) {
     // Sort by input ranges ascending
     points.sort(function(a, b) {
-      return a.input - b.input;
+      return (a.input - b.input);
     });
+  
+    if (points.length == 2) {
+      var slope = (points[1].output - points[0].output) /  
+                  (points[1].input - points[0].input);
+  
+      this.curve = function(value) {
+        if (value < points[0].input) {
+          return 0;
+        } else if (value > points[1].input) {
+          return 255;
+        } else {
+          return (value - points[0].input) * slope + points[0].output;
+        }
+      };
+    } else { 
+      // Compute k1..kn for natural cubic splines
+      var coefficients = [];
+      var vector = [];
+  
+      var i = 0, j = 0;
+      var size = points.length;
+  
+      for (i = 0; i < size; i++) {
+        coefficients[i] = [];
+        for (j = 0; j < size; j++) {
+          coefficients[i][j] = 0;
+        }
+        vector[i] = [];
+        vector[i][0] = 0;
+      }
+  
+      coefficients[0][0] = 2 / (points[1].input - points[0].input);
+      coefficients[0][1] = 1 / (points[1].input - points[0].input);
+      vector[0][0] = 3 * (points[1].output - points[0].output) / Math.pow(points[1].input - points[0].input, 2);
+  
+      i = size-1;
+      coefficients[i][i]   = 2 / (points[i].input - points[i-1].input);
+      coefficients[i][i-1] = 1 / (points[i].input - points[i-1].input);
+      vector[i][0] = 3 * (points[i].output - points[i-1].output) / Math.pow(points[i].input - points[i-1].input, 2);
+  
+      for (i = 1; i < size-1; i++) {
+        coefficients[i][i-1] = 1 / (points[i].input - points[i-1].input);
+        coefficients[i][i  ] = 2 * ( 1 / (points[i].input - points[i-1].input) + 1 / (points[i+1].input - points[i].input) );
+        coefficients[i][i+1] = 1 / (points[i+1].input - points[i].input);
+        vector[i][0] = 3 * ( (points[i].output - points[i-1].output) / Math.pow(points[i].input - points[i-1].input, 2) + (points[i+1].output - points[i].output) / Math.pow(points[i+1].input - points[i].input, 2) );
+      }
+  
+      var k = Matrix.solveLinearEquations(coefficients, vector); 
+  
+      // Generate the piecewise function
+      var pieces = [];
+      if (points[0].input > 0) {
+        pieces.push({
+          start: 0,
+          end: points[0].input,
+          f: function(value) { return 0; }
+        });
+      }
+  
+      var makePiece = function(a, b, i) {
+        return function(value) {
+          var t = (value - points[i].input) / (points[i+1].input - points[i].input);
+          return (1-t) * points[i].output + t * points[i+1].output + t * (1-t) * (a * (1-t) + b * t);
+        };
+      };
+      for (i = 0; i < size-1; i++) {
+        var a = k[i] * (points[i+1].input - points[i].input) - (points[i+1].output - points[i].output);
+        var b = -k[i+1] * (points[i+1].input - points[i].input) + (points[i+1].output - points[i].output);
+  
+        pieces.push({
+          start: points[i].input,
+          end:   points[i+1].input,
+          f:     makePiece(a, b, i)
+        });
+      }
+  
+      if (points[size-1].input < 255) {
+        pieces.push({
+          start: points[size-1].input,
+          end: 255,
+          f: function(value) { return 255; }
+        });
+      }
+  
+      var cache = [];
+      this.curve = function(value) {
+        if (cache[value] !== undefined) {
+          return cache[value];
+        }
+  
+        // Binary search for the piecewise function
+        var low  = 0;
+        var high = pieces.length-1;
+        var piece = null;
+  
+        while (low < high) {
+          var mid = Math.floor((high + low) / 2);
+          if (pieces[mid].start > value) {
+            high = mid-1;
+          } else if (pieces[mid].end < value) {
+            low  = mid+1;
+          } else {
+            piece = pieces[mid].f;
+            break;
+          }
+        }
+        if (!piece) {
+          piece = pieces[low].f;
+        }
+  
+        cache[value] = piece(value);
+        return cache[value];
+      };
+    }
   };
   
   CurvesFilter.prototype.render = function(imageData) {
@@ -534,6 +757,7 @@
   Context.prototype.createCurvesFilter = function() {
     return new CurvesFilter();
   };
+  
   
   /**
    * Shifts the hue of the image.
