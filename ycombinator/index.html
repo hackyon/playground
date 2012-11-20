@@ -12,7 +12,7 @@
         return (x(x)).apply(null, [].splice.call(arguments, 0));
       });
     })(function(x) {
-      return f(function(v) {
+      return f(function() {
         return (x(x)).apply(null, [].splice.call(arguments, 0));
       });
     });
@@ -82,11 +82,11 @@
   <code><pre>
   var yCombinator = function(f) {
     return (function(x) {
-      return f(function(v) {
+      return f(function() {
         return (x(x)).apply(null, [].splice.call(arguments, 0));
       });
     })(function(x) {
-      return f(function(v) {
+      return f(function() {
         return (x(x)).apply(null, [].splice.call(arguments, 0));
       });
     });
@@ -118,6 +118,6 @@
   console.log(factorial(10)); // 3628800
   </pre></code>
   </table>
-  <p>The implementation actually uses a slight variation of the Y Combinator called the Z Combinator, where <code>Z = λf.(λx.f (λv.((x x) v))) (λx.f (λv.((x x) v)))</code>. The Z Combinator is just like the Y Combinator except an additional function is added ("Eta-Expansion") to stop the Y Combinator from evaluating until the resulting function is called.</p>
+  <p>The above implementation is in fact a slight variation of the Y Combinator called the Z Combinator, where <code>Z = λf.(λx.f (λv.((x x) v))) (λx.f (λv.((x x) v)))</code>. The Z Combinator is just like the Y Combinator except an additional function is added ("Eta-Expansion") to stop the Y Combinator from evaluating until the resulting function is called.</p>
 </body>
 </html>
