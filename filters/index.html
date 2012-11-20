@@ -97,7 +97,8 @@ a.grow:hover img {
 
   <script type="text/javascript" src="filters.js"></script>
   <script type="text/javascript">
-  // TODO: Common Photograph Filters (ex. Sepia), Rotation, Resize (with Dithering)
+  // TODO: Common Photograph Filters (ex. Sepia, Diana)
+  // TODO: Rotation, Resize (with Dithering)
 
   $(document).ready(function() {
     // Filters are namespaced under the ImageFilterContext
@@ -165,8 +166,12 @@ a.grow:hover img {
         destinations.push(destination);
       });
 
+      // Sepia Filter
+      var sepia = context.createSepiaFilter();
+      sepia.connect(destinations[0]);
+
       sources[0].url = 'images/door.png';
-      sources[0].connect(destinations[0]);
+      sources[0].connect(sepia);
 
       // Pixelate Filter
       var pixelate = context.createPixelateFilter();
