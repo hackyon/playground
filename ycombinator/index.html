@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Y Combinator Experiment</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="description" content="Experimenting with the Y Combinator." />
+
+<script type="text/javascript">
+  var yCombinator = function(f) {
+    return (function(x) {
+      return f(function() {
+        return (x(x)).apply(null, [].splice.call(arguments, 0));
+      });
+    })(function(x) {
+      return f(function(v) {
+        return (x(x)).apply(null, [].splice.call(arguments, 0));
+      });
+    });
+  };
+
+  var factorial = yCombinator(function(fac) {
+    return function(n) {
+      if (n === 0) {
+        return 1;
+      } else {
+        return n * fac(n-1);
+      }
+    }
+  });
+
+  /* 
+  // Recursive factorial function that references itself
+  var factorial = function(n) {
+    if (n === 0) {
+      return 1;
+    } else {
+      return n * factorial(n-1); // Bingo!
+    }
+  };
+  */
+
+  console.log(factorial(5));  // 120
+  console.log(factorial(6));  // 720
+  console.log(factorial(10)); // 3628800
+
+  // Recursive binary search
+  var arr = [-100, -32, -1, 0, 10, 23, 24, 32, 55, 100];
+  var binarySearch = yCombinator(function(search) {
+    return function(n, arr, lower, upper) {
+      if (lower === undefined) lower = 0;
+      if (upper === undefined) upper = arr.length-1;
+
+      if (lower >= upper) {
+        return (n === arr[lower]);
+      }
+
+      var mid = Math.floor((upper + lower) / 2);
+      if (n > arr[mid]) {
+        return search(n, arr, mid+1, upper);
+      } else {
+        return search(n, arr, lower, mid);
+      }
+    };
+  });
+
+  console.log(binarySearch(-100, arr)); // true
+  console.log(binarySearch(100, arr));  // true
+  console.log(binarySearch(23, arr));   // true
+  console.log(binarySearch(-2, arr));   // false
+  console.log(binarySearch(-200, arr)); // false
+  console.log(binarySearch(200, arr));  // false
+  console.log(binarySearch(5, arr));    // false
+</script>
+
+</head>
+<body>
+  <h1>Y Combinator</h1>
+  <p>The first thing that mother Google shows on <a href="https://www.google.com/search?q=ycombinator" target="_blank">a search for Y Combinator</a> is the <a href="http://ycombinator.com" target="_blank">startup seed accelerator</a>. There is significantly less (and lower priority) results about what the real meaning behind the Y Combinator is.</p>
+  <p>One of the <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator" target="_blank">best resources on the Y Combinator</a> (no surprises there) describes the Y Combinator as a particular fixed-point combinators that was discovered by our beloved <a href="http://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry</a>. The definition for a fixed-point combinator, <code>g</code>, is <code>g(f) = f(g(f))</code>. What's super cool is that you can easily keep applying that equation to itself, yielding <code>g(f) = f(g(f)) = f(f(g(f))) = f(f(f(...)))</code>! To infinity and beyond! In practice, a fixed-point combinator can be used to support anonymous recursive functions, allowing recursion to happen without binding functions to identifiers.</p>
+  
+  <p>The Y Combinator is defined as <code>Y = λf.(λx.f (x x)) (λx.f (x x))</code>. The Javascript implementation of the Y Combinator on this page demonstrates how the factorial function can be defined without referencing it ever having to reference itself:</p>
+  <code><pre>
+  var yCombinator = function(f) {
+    return (function(x) {
+      return f(function(v) {
+        return (x(x)).apply(null, [].splice.call(arguments, 0));
+      });
+    })(function(x) {
+      return f(function(v) {
+        return (x(x)).apply(null, [].splice.call(arguments, 0));
+      });
+    });
+  };
+
+  var factorial = yCombinator(function(fac) {
+    return function(n) {
+      if (n === 0) {
+        return 1;
+      } else {
+        return n * fac(n-1);
+      }
+    }
+  });
+
+  /* 
+  // Recursive factorial function that references itself
+  var factorial = function(n) {
+    if (n === 0) {
+      return 1;
+    } else {
+      return n * factorial(n-1); // Bingo!
+    }
+  };
+  */
+
+  console.log(factorial(5));  // 120
+  console.log(factorial(6));  // 720
+  console.log(factorial(10)); // 3628800
+  </pre></code>
+  </table>
+  <p>The implementation actually uses a slight variation of the Y Combinator called the Z Combinator, where <code>Z = λf.(λx.f (λv.((x x) v))) (λx.f (λv.((x x) v)))</code>. The Z Combinator is just like the Y Combinator except an additional function is added ("Eta-Expansion") to stop the Y Combinator from evaluating until the resulting function is called.</p>
+</body>
+</html>
