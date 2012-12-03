@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fisheye Effect</title>
+<meta name="viewport" content="width=500">
+<style>
+  html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    position: relative;
+    min-height: 350px;
+    min-width: 420px;
+  }
+  #canvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -150px 0 0 -150px;
+  }
+
+  header {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-family: Arial, Helvetica;
+    text-transform: uppercase;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    width: 300px;
+    font-weight: normal;
+    font-size: 11px;
+    color: #777;
+    margin: 10px 5px 10px 15px;
+    padding: 0;
+    float: left;
+  }
+  a {
+    display: block;
+    float: right;
+    width: 80px;
+    font-size: 11px;
+    text-decoration: none;
+    color: #aaa;
+    margin: 10px 15px 10px 5px;
+    text-align: right;
+
+    transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -webkit-transition: all 0.5s;
+    -o-transition: all 0.5s;
+  }
+  a:hover {
+    color: #555;
+  }
+</style>
+</head>
+<body>
+<canvas width="300" height="300" id="canvas">
+  Canvas is not supported. Please upgrade your browser.
+</canvas>
+
+<header>
+  <h1>Fisheye Effect (Javascript on Canvas)</h1>
+  <a href="http://www.badassdon.com/" id="more">Read more</a>
+</header>
+
+<script type="text/javascript">
+  var SIZE = 100;
+
+  window.onload = function() {
+
+    // Computes the offset (relative to the page) of an element
+    var computeOffset = function(element) {
+      var left = 0;
+      var top  = 0;
+      if (element.offsetParent) {
+        do {
+          left += element.offsetLeft;
+          top  += element.offsetTop;
+        } while (element = element.offsetParent);
+      }
+      return { top: top, left: left };
+    };
+
+    // Render image onto canvas
+    var canvas  = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    var image = new Image();
+    image.onload = function() {
+      context.drawImage(image, 30, 30);
+     
+      // Read the original frame data as the source
+      var frame  = context.getImageData(0, 0, canvas.width, canvas.height);
+      try {
+        var source = new Uint8ClampedArray(frame.data);
+      } catch(e) {
+        var source = new Uint8Array(frame.data);
+      }
+
+      // Compute the offset of the canvas
+      var offset = computeOffset(canvas);
+      window.onresize = function(e) {
+        offset = computeOffset(canvas);
+      };
+
+
+      // Attach mouseover for fisheye effect
+      var movement = function(mouseX, mouseY) {
+        var frame = context.getImageData(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < frame.data.length; i += 4) {
+          var x = (i/4) % frame.width;
+          var y = Math.floor(i/4 / frame.width);
+
+          var dx = mouseX - x;
+          var dy = mouseY - y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+
+          var i2 = i;
+          if (dist <= SIZE) {
+            // If the pixel is within a certain distance from the mouse, 
+            // map it to a different spot on the canvas
+            var x2 = Math.round(mouseX - dx * Math.sin(dist/SIZE*Math.PI/2));
+            var y2 = Math.round(mouseY - dy * Math.sin(dist/SIZE*Math.PI/2)); 
+            var i2 = (y2 * frame.width + x2) * 4;
+          } 
+          frame.data[i  ] = source[i2];
+          frame.data[i+1] = source[i2+1];
+          frame.data[i+2] = source[i2+2];
+          frame.data[i+3] = source[i2+3];
+        }
+        context.putImageData(frame, 0, 0);
+      };
+      window.onmousemove = function(e) {
+        var mouseX = e.pageX - offset.left;
+        var mouseY = e.pageY - offset.top;
+        movement(mouseX, mouseY);
+      };
+    };
+    image.src = 'bigd.png';
+  };
+</script>
+</body>
+</html>
