@@ -8,8 +8,9 @@
  * Copyright (c) 2012 Donald Lau (badassdon)
  */
 (function($) {
-  // TODO: Mobile support
   // TODO: Smooth custom 'animation' for scrollLeft (should not use jQuery animation since the scroll is constantly changing)
+  
+  var mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 
   var methods = {
     init : function(options) {
@@ -36,7 +37,7 @@
         $this.children().css({
           'display': 'block',
           'position': 'absolute'
-        }); 
+        });
 
         // Measurements for computing scroll
         var containerWidth  = 0;
@@ -79,17 +80,25 @@
           
           containerOffset = $this.offset();
 
+          if (computeHeight && mobile) {
+            contentHeight += 15; // Estimated padding for scrollbar
+          }
           $this.css('height', contentHeight);
         };
         recompute();
 
-        // Attach mouse move events
-        $this.mousemove(function(e) {
-          var offsetX = e.pageX - containerOffset.left;
-          var percent = (offsetX - config.padding) / (containerWidth - 2*config.padding);
-          percent = Math.max(0, Math.min(percent, 100));
-          $this.scrollLeft(percent * scrollWidth);
-        });
+        if (!mobile) {
+          // Attach mouse move events
+          $this.mousemove(function(e) {
+            var offsetX = e.pageX - containerOffset.left;
+            var percent = (offsetX - config.padding) / (containerWidth - 2*config.padding);
+            percent = Math.max(0, Math.min(percent, 100));
+            $this.scrollLeft(percent * scrollWidth);
+          });
+        } else {
+          // Enable scroll on mobile devices
+          $this.css('overflow-x', 'scroll');
+        }
 
         // Recompute on resize event
         var delay = null;
