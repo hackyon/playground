@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>jQuery Slideshow (Free - MIT License)</title>
+<link href='http://fonts.googleapis.com/css?family=Lato:100|Open+Sans' rel='stylesheet' type='text/css'>
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  height: 100%;
+  background: url(images/blackorchid.png) #1a1a1a repeat;
+}
+#container {
+  position: fixed;
+  width: 400px;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+#gradient {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: -moz-linear-gradient(left,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 90%, rgba(0,0,0,0.8) 100%); 
+  background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0)), color-stop(90%,rgba(0,0,0,0.5)), color-stop(100%,rgba(0,0,0,0.8)));
+  background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 90%, rgba(0,0,0,0.8) 100%); 
+  background: -o-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 90%,rgba(0,0,0,0.8) 100%);
+  background: -ms-linear-gradient(left,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 90%,rgba(0,0,0,0.8) 100%);
+  background: linear-gradient(to right,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.5) 90%,rgba(0,0,0,0.8) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#AA000000',GradientType=1 );
+}
+
+/* Viewport */
+#slideshow {  
+  width: 400px;
+  height: 100%;
+}
+#slideshow .viewport {
+  width: 100%;
+  height: 100%;
+}
+#slideshow .viewport {
+  background: url(images/load.gif) #000 center center no-repeat;
+}
+
+/* Progress */
+#progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  background: #fff;
+  opacity: 0.2;
+  height: 5px;
+}
+
+/* Thumbnails */
+#thumbnails {
+  list-style: none;
+  margin: 30px 0 0 0;
+  padding: 0;
+}
+#thumbnails li {
+  margin: 0 5px 5px 0;
+  padding: 1px;
+  border: 1px solid #444;
+  display: block;
+  float: left;
+  width: 60px;
+  height: 60px;
+}
+#thumbnails li.selected {
+  border: 1px solid #aaa;
+}
+#thumbnails li:hover {
+  border: 1px solid #aaa;
+}
+#thumbnails li a {
+  display: block;
+  overflow: hidden;
+}
+#thumbnails li img {
+  height: 60px;
+}
+
+/* Content */
+#content {
+  float: left;
+  margin: 0 0 0 400px;
+  padding: 0 30px;
+  display: block;
+  height: 100%;
+  color: #777;
+  z-index: 2;
+}
+h1 {
+  margin: 50px 0 0 1px;
+  padding: 0;
+  font-family: 'Lato','Open Sans',sans-serif;
+  font-weight: 100;
+  font-weight: normal;
+  font-size: 25px;
+  color: #fff;
+}
+h1 em {
+  color: #e00;
+  font-style: normal;
+}
+p.tagline {
+  width: 300px;
+  margin: 7px 0;
+}
+
+#footer {
+  border-top: 1px solid #222;
+  margin: 70px 0 0 0;
+  padding: 5px 0 50px 0;
+  color: #333;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+#footer p {
+  margin: 2px 0;
+}
+#footer a {
+  color: #555;
+}
+#footer a:hover {
+  color: #aaa;
+}
+#badassdon {
+  position: relative;
+  top: 2px;
+  left: 3px;
+}
+
+.clear {
+  clear: both;
+}
+
+a {
+  color: #bbb;
+}
+a:hover {
+  color: #ccc;
+}
+
+</style>
+</head>
+
+<body>
+  <div id="content">
+    <div id="header">
+      <h1>jQuery <em>Slideshow</em></h1>
+      <p class="tagline">Fancy slideshow for your images (jQuery plugin), available freely under the MIT License.</p>
+    </div>
+    <ul id="thumbnails">
+      <li><a href="images/originals/1.jpg" data-transition="StripsHorizontal"><img src="images/thumbnails/1.jpg"/></a></li>
+      <li><a href="images/originals/2.jpg"><img src="images/thumbnails/2.jpg"/></a></li>
+      <li><a href="images/originals/3.jpg"><img src="images/thumbnails/3.jpg"/></a></li>
+      <li><a href="images/originals/4.jpg"><img src="images/thumbnails/4.jpg"/></a></li>
+      <li><a href="images/originals/5.jpg"><img src="images/thumbnails/5.jpg"/></a></li>
+    </ul>
+    <div class="clear"></div>
+    <div id="footer">
+      <p>Photos are copyrighted (c).</p>
+      <p>Made by <a href="http://www.badassdon.com" id="badassdon" target="_blank"><img src="images/badassdon.png" width="15" height="15"></a></p>
+    </div>
+  </div>
+  <div id="container">
+    <div id="gradient"></div>
+    <div id="slideshow">
+      <div class="viewport"></div>
+    </div>
+  </div>
+  <div id="progress"></div>
+
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="lib/jquery-1.8.2.min.js"><\/script>')</script>
+  <script type="text/javascript" src="jquery.slideshow.js"></script>
+  <script>
+    var $progress = $("#progress");
+    $("#slideshow").slideshow({
+      $thumbnails: $('#thumbnails'),
+      progress: function(percent) {
+        $progress.css('width', percent + "%");
+      }
+    });
+
+    $("#container").mouseover(function() {
+      $("#slideshow").slideshow('pause');
+    }).mouseout(function() {
+      $("#slideshow").slideshow('start');
+    });
+  </script>
+</body>
+</html>
