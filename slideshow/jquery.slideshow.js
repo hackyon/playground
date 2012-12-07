@@ -482,6 +482,11 @@
       return this.each(function() {
         var $this = $(this);
 
+        var pause = $this.data('slideshow.pause');
+        if (typeof pause === 'number') {
+          return;
+        }
+
         var data = $this.data('slideshow');
         var config = data.config;
 
@@ -491,10 +496,17 @@
           $this.data('slideshow.timeout', null);
         }
 
-        // Save the remaining time
-        var start = $this.data('slideshow.start');
-        var elapsed   = (+new Date()) - start;
-        var remaining = config.time - elapsed;
+        var remaining = config.time;
+
+        var transitioning = $this.data('slideshow.transitioning');
+        if (transitioning) {
+          remaining = config.time;
+        } else {
+          // Save the remaining time
+          var start   = $this.data('slideshow.start');
+          var elapsed = (+new Date()) - start;
+          remaining   = config.time - elapsed;
+        }
 
         $this.data('slideshow.pause', remaining);
       });
