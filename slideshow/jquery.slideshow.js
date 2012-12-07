@@ -111,7 +111,9 @@
     var grid = new Grid(this.boxWidth, this.boxHeight);
     grid.attach($viewport, $image, current);
     var shiftWidth = parseInt($image.css('width'));
-    $image.css(offsets).attr('src', next);
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
 
     var counter = 0;
     for (var x = 0; x < cols; x++) {
@@ -154,7 +156,9 @@
 
     var grid = new Grid(this.boxWidth, this.boxHeight);
     grid.attach($viewport, $image, current);
-    $image.css(offsets).attr('src', next);
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
 
     var counter = 0;
     for (var x = 0; x < cols; x++) {
