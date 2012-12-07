@@ -3,7 +3,7 @@
 <head>
 <title>Y Combinator Experiment</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="description" content="Experimenting with the Y Combinator." />
+<meta name="description" content="Experimenting with the Y Combinator using Javascript" />
 
 <script type="text/javascript">
   var yCombinator = function(f) {
@@ -34,7 +34,7 @@
     if (n === 0) {
       return 1;
     } else {
-      return n * factorial(n-1); // Bingo!
+      return n * factorial(n-1); // Self-reference
     }
   };
   */
@@ -72,13 +72,21 @@
   console.log(binarySearch(5, arr));    // false
 </script>
 
+<style>
+  html, body {
+    font-family: sans-serif;
+    font-size: 13px;
+    margin: 15px 20px 80px 20px;
+  }
+</style>
+
 </head>
 <body>
-  <h1>Y Combinator</h1>
-  <p>The first thing that mother Google shows on <a href="https://www.google.com/search?q=ycombinator" target="_blank">a search for Y Combinator</a> is the <a href="http://ycombinator.com" target="_blank">startup seed accelerator</a>. There is significantly less (and lower priority) results about what the real meaning behind the Y Combinator is.</p>
-  <p>One of the <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator" target="_blank">best resources on the Y Combinator</a> (no surprises there) describes the Y Combinator as a particular fixed-point combinators that was discovered by our beloved <a href="http://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry</a>. The definition for a fixed-point combinator, <code>g</code>, is <code>g(f) = f(g(f))</code>. What's super cool is that you can easily keep applying that equation to itself, yielding <code>g(f) = f(g(f)) = f(f(g(f))) = f(f(f(...)))</code>! To infinity and beyond! In practice, a fixed-point combinator can be used to support anonymous recursive functions, allowing recursion to happen without binding functions to identifiers.</p>
+  <h1>The Y Combinator</h1>
+  <p>The first thing you get when you ask mother Google <a href="https://www.google.com/search?q=ycombinator" target="_blank">about the Y Combinator</a> is the infamous <a href="http://ycombinator.com" target="_blank">startup seed accelerator</a>. There are barely any results for the mathematical operator in which the startup accelerator takes its name.
+  <p>One of the <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator" target="_blank">most convenient resources on the Y Combinator</a> (no surprises there) describes the Y Combinator as a particular fixed-point combinator that was discovered by our beloved <a href="http://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry</a>. The definition of a fixed-point combinator, <code>g</code>, is <code>g(f) = f(g(f))</code>. Notice how you can keep applying that equation to itself, yielding <code>g(f) = f(g(f)) = f(f(g(f))) = f(f(f(...)))</code>! In practice, a fixed-point combinator can be used to support anonymous recursive functions, allowing recursion to happen without binding functions to identifiers.</p>
   
-  <p>The Y Combinator is defined as <code>Y = λf.(λx.f (x x)) (λx.f (x x))</code>. The Javascript implementation of the Y Combinator on this page demonstrates how the factorial function can be defined without referencing it ever having to reference itself:</p>
+  <p>The Y Combinator is defined as <code>Y = λf.(λx.f (x x)) (λx.f (x x))</code>. The Javascript implementation of the Y Combinator on this page demonstrates how the factorial function can be defined without it ever having to reference itself:</p>
   <code><pre>
   var yCombinator = function(f) {
     return (function(x) {
@@ -108,7 +116,7 @@
     if (n === 0) {
       return 1;
     } else {
-      return n * factorial(n-1); // Bingo!
+      return n * factorial(n-1); // Self-referene
     }
   };
   */
@@ -118,6 +126,7 @@
   console.log(factorial(10)); // 3628800
   </pre></code>
   </table>
-  <p>The above implementation is in fact a slight variation of the Y Combinator called the Z Combinator, where <code>Z = λf.(λx.f (λv.((x x) v))) (λx.f (λv.((x x) v)))</code>. The Z Combinator is just like the Y Combinator except an additional function is added ("Eta-Expansion") to stop the Y Combinator from evaluating until the resulting function is called.</p>
+  <p>The above implementation is in fact a slight variation of the Y Combinator called the Z Combinator, where <code>Z = λf.(λx.f (λv.((x x) v))) (λx.f (λv.((x x) v)))</code>. The Z Combinator is just like the Y Combinator, except an additional function is added to prevent the Y Combinator from evaluating until the resulting function is called ("Eta-Expansion").</p>
+  <p><a href="http://www.badassdon.com">Back to badassdon.com</a></p>
 </body>
 </html>
