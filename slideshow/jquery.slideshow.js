@@ -11,12 +11,12 @@
 // TODO: Resizable viewport
 // TODO: Do not block transitions to wait for img.onload()
 // TODO: Special fullscreen mode
-// BUG: Padded mode need background color to cover up bigger next images
 // BUG: Cropping resizes images and may cause 1-2 pixel(s) deviation for grid
 
-  var Grid = function(boxWidth, boxHeight) {
+  var Grid = function(boxWidth, boxHeight, background) {
     this.boxWidth  = boxWidth;
     this.boxHeight = boxHeight;
+    this.background = background || 'transparent';
   }
 
   Grid.prototype.attach = function($viewport, $image, src) {
@@ -58,7 +58,7 @@
           'position': 'absolute',
           'top':  (y * this.boxHeight) + 'px',
           'left': (x * this.boxWidth)  + 'px',
-          'background': 'transparent',
+          'background': this.background,
           'overflow': 'hidden'
         });
         
@@ -90,41 +90,127 @@
     this.$container.remove();
     this.boxes = null;
   };
+
+  var CircularGrid = function(width, background) {
+    this.width = width;
+    this.background = background || 'transparent';
+  }
+
+  CircularGrid.prototype.attach = function($viewport, $image, src) {
+    var rows = $viewport.height() / this.boxHeight;
+    var cols = $viewport.width()  / this.boxWidth;
+
+    var offsets = {
+      'left': parseInt($image.css('left')),
+      'top':  parseInt($image.css('top')),
+      'width':  parseInt($image.css('width')), 
+      'height': parseInt($image.css('height')),
+    };
+
+    var $container = $('<div/>');
+    $container.css({
+      'position': 'relative',
+      'z-index': '2'
+    });
+
+    var grid = [];
+    for (var x = 0; x < cols; x++) {
+      grid[x] = [];
+
+      var width  = this.boxWidth;
+      if (x+1 > cols) {
+        width = $viewport.width() % this.boxWidth;
+      }
+      for (var y = 0; y < rows; y++) {
+        var $box = $('<div/>');
+
+        var height = this.boxHeight;
+        if (y+1 > rows) {
+          height = $viewport.height() % this.boxHeight;
+        }
+
+        $box.css({
+          'width':  width  + 'px',
+          'height': height + 'px',
+          'position': 'absolute',
+          'top':  (y * this.boxHeight) + 'px',
+          'left': (x * this.boxWidth)  + 'px',
+          'background': this.background,
+          'overflow': 'hidden'
+        });
+        
+        var $image = $('<img/>');
+        $image.css({
+          'width':  offsets.width  + 'px',
+          'height': offsets.height + 'px',
+          'position': 'absolute',
+          'top':  -(y * this.boxHeight) + offsets.top  + 'px',
+          'left': -(x * this.boxWidth)  + offsets.left + 'px'
+        });
+        $image.attr('src', src);
+        $box.append($image);
+
+        grid[x][y] = $box;
+        $container.append($box);
+      }
+    }
+    
+    $viewport.append($container);
+
+    this.boxes = grid;
+    this.n = cols * rows;
+    this.src = src;
+    this.$container = $container;
+    this.$viewport = $viewport;
+  };
+  CircularGrid.prototype.destroy = function() {
+    this.$container.remove();
+    this.boxes = null;
+  };
  
 
-  var StripsHorizontalTransition = function(boxWidth, boxHeight, duration) {
-    this.boxWidth  = boxWidth;
-    this.boxHeight = boxHeight;
+  var StripsBiHorizontalTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
 
-    this.slideDuration = duration || 1000;
+    this.duration = duration || 1000;
   };
-  StripsHorizontalTransition.prototype.duration = function($viewport, $image) {
-    return this.slideDuration;
+  StripsBiHorizontalTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
   };
-  StripsHorizontalTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+  StripsBiHorizontalTransition.prototype.run = function($viewport, $image, offsets, current, next) {
     var viewportWidth  = $viewport.width();
     var viewportHeight = $viewport.height();
 
     var cols = viewportWidth  / this.boxWidth;
     var rows = viewportHeight / this.boxHeight;
 
-    var grid = new Grid(this.boxWidth, this.boxHeight);
+    var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
     grid.attach($viewport, $image, current);
-    var shiftWidth = parseInt($image.css('width'));
+    
     setTimeout(function() {
       $image.css(offsets).attr('src', next);
     }, 0);
+
+    var shiftWidth = parseInt($viewport.width());
+    var step = 0.75 * this.duration / rows;
 
     var counter = 0;
     for (var x = 0; x < cols; x++) {
       for (var y = 0; y < rows; y++) {
         var sign = (y % 2 !== 0) ? 1 : -1;
 
-        var $img = grid.boxes[x][y].find('img');
-        var left = parseInt($img.css('left'));
-        $img.animate(
-          { 'left': left + (sign * shiftWidth) + 'px' }, 
-          this.slideDuration, 
+        var durationOffset = y * step;
+
+        var $box = grid.boxes[x][y];
+        var left = parseInt($box.css('left'));
+        $box.delay(durationOffset).animate(
+          { 
+            'left': left + (sign * shiftWidth) + 'px',
+            'opacity': 0
+          }, 
+          this.duration - durationOffset, 
           function() { 
             counter += 1;
             if (counter >= grid.n) {
@@ -136,15 +222,67 @@
     }
   };
 
-  var FadingColumnsTransition = function(boxWidth, boxHeight, duration) {
-    this.boxWidth  = boxWidth;
-    this.boxHeight = boxHeight;
+  var StripsVerticalTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
 
-    this.fadeDuration = duration || 1500;
+    this.duration = duration || 1000;
   };
-  FadingColumnsTransition.prototype.duration = function($viewport, $image) {
-    return this.fadeDuration;
-  }
+  StripsVerticalTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  StripsVerticalTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+    var viewportWidth  = $viewport.width();
+    var viewportHeight = $viewport.height();
+
+    var cols = viewportWidth  / this.boxWidth;
+    var rows = viewportHeight / this.boxHeight;
+
+    var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
+    grid.attach($viewport, $image, current);
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
+
+    var shiftHeight = parseInt($viewport.height());
+    var duration = this.duration / 2;
+
+    var counter = 0;
+    for (var x = 0; x < cols; x++) {
+      for (var y = 0; y < rows; y++) {
+        var durationOffset = 0.5 * (x / cols) * this.duration;
+
+        var $box = grid.boxes[x][y];
+        var top = parseInt($box.css('top'));
+        $box.delay(durationOffset).animate(
+          { 
+            'top': (top + shiftHeight) + 'px',
+            'opacity': 0
+          }, 
+          duration,
+          function() { 
+            counter += 1;
+            if (counter >= grid.n) {
+              // Destroy the grid after the transition
+              grid.destroy();
+            }
+          });
+      }
+    }
+  };
+
+
+  var FadingColumnsTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  FadingColumnsTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
   FadingColumnsTransition.prototype.run = function($viewport, $image, offsets, current, next) {
     var viewportWidth  = $viewport.width();
     var viewportHeight = $viewport.height();
@@ -152,10 +290,11 @@
     var cols = viewportWidth  / this.boxWidth;
     var rows = viewportHeight / this.boxHeight;
 
-    var wait = this.fadeDuration / (rows+1) / cols;
+    var wait = (this.duration - 300) / (rows+1) / cols;
 
-    var grid = new Grid(this.boxWidth, this.boxHeight);
+    var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
     grid.attach($viewport, $image, current);
+
     setTimeout(function() {
       $image.css(offsets).attr('src', next);
     }, 0);
@@ -164,22 +303,147 @@
     for (var x = 0; x < cols; x++) {
       for (var y = 0; y < rows; y++) {
         var time = (y + rows * x) * wait;
-        var fader = (function($box) {
-          return function() {
-            $box.fadeOut(300);
+        var $box = grid.boxes[x][y];
 
-            // Destroy the grid after the transition
-            counter += 1;
-            if (counter >= grid.n) {
-              grid.destroy();
-            }
-          };
-        })(grid.boxes[x][y]);
-
-        setTimeout(fader, time);
+        $box.delay(time).fadeOut(300, function() {
+          // Destroy the grid after the transition
+          counter += 1;
+          if (counter >= grid.n) {
+            grid.destroy();
+          }
+        });
       }
     }
   };
+
+  var ShrinkingBlocksTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  ShrinkingBlocksTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  ShrinkingBlocksTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+    var viewportWidth  = $viewport.width();
+    var viewportHeight = $viewport.height();
+
+    var cols = viewportWidth  / this.boxWidth;
+    var rows = viewportHeight / this.boxHeight;
+
+    var wait = (this.duration - 300) / (rows+1) / cols / 1000;
+
+    var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
+    grid.attach($viewport, $image, current);
+
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
+
+    for (var x = 0; x < cols; x++) {
+      for (var y = 0; y < rows; y++) {
+        var time = (y + rows * x) * wait;
+        var $box = grid.boxes[x][y];
+
+        $box.css({
+          '-webkit-transition': 'all 0.3s linear',
+          //'transition': 'all 1s ease-out',
+        });
+        $box.css({
+          //'-webkit-transform': 'scale(0.75)',
+          'opacity': '0'
+        });
+      }
+    }
+
+    setTimeout(function() {
+      // Destroy the grid after the transition
+      grid.destroy();
+    }, this.duration);
+  };
+
+  var DissolveTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  DissolveTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  DissolveTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+
+    var $back = $('<img/>');
+    $back.attr('src', next);
+    $back.css({
+      'position': 'absolute'
+    }).css(offsets);
+
+    $viewport.append($back);
+    $image.fadeOut(this.duration, function() {
+      $image.css(offsets).attr('src', next).show();
+      $back.remove();
+    });
+  };
+
+  var SlideLeftTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  SlideLeftTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  SlideLeftTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+
+    var $slide = $('<div/>');
+    $slide.css({
+      'position': 'absolute',
+      'top': '0',
+      'left': $viewport.width(),
+      'width': $viewport.width(),
+      'height': $viewport.height(),
+      'overflow': 'hidden',
+      'z-index': '2'
+    });
+
+    var $slideImage = $('<img/>');
+    $slideImage.attr('src', next);
+    $slideImage.css('position', 'absolute').css(offsets);
+
+    $slide.append($slideImage);
+    $viewport.append($slide);
+
+    var left = parseInt($image.css('left')) - $viewport.width();
+
+    $slide.animate({ 'left': 0 }, this.duration);
+    $image.animate({ 'left': left }, this.duration, 
+      function() {
+        $image.css(offsets).attr('src', next);
+        $slide.remove();
+      }
+    );
+  };
+
+  var RotatingCirclesTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  RotatingCirclesTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  RotatingCirclesTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+    // Define "circular" grid
+  };
+
 
   /**
    * Compute offset of the image based on overflow type
@@ -286,7 +550,7 @@
       $this.data('slideshow.start', -1);
       $this.data('slideshow.transitioning', true);
 
-      duration = transition.duration($viewport, $image);
+      duration = transition.computeDuration($viewport, $image);
     } else {
       duration = 0;
     }
@@ -337,12 +601,29 @@
 
       // Initialize the transitions based on config
       var transitions = {
-        'FadingColumns':    new FadingColumnsTransition(config.boxWidth, config.boxHeight),
-        'StripsHorizontal': new StripsHorizontalTransition(config.boxWidth, config.boxHeight),
+        'FadingColumns':    new FadingColumnsTransition(config),
+        'StripsBiHorizontal': new StripsBiHorizontalTransition(config),
+        'StripsVertical': new StripsVerticalTransition(config),
+        'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
+        'Dissolve': new DissolveTransition(config),
+        'SlideLeft': new SlideLeftTransition(config),
+        //'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
+        //'ShrinkingCircles': new ShrinkingCirclesTransition(config),
+        'RotatingCircles': new RotatingCirclesTransition(config),
+        //'Blinds': new BlindsTransition(config),
+        //'SlideGradient': new SlideGradientTransition(config)
       };
       var activeTransitions = [ 
         'FadingColumns', 
-        'StripsHorizontal' 
+        //'StripsBiHorizontal',
+        //'StripsVertical',
+        //'Dissolve',
+        //'SlideLeft',
+        // TODO: 'ShrinkingBlocks', 
+        // TODO: 'ShrinkingCircles',
+        // TODO: 'RotatingCircles',
+        // TODO: 'Blinds' (need CSS technique?)
+        // TODO: 'SlideGradient',
       ];
 
       return this.each(function() {
