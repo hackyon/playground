@@ -7,7 +7,6 @@
  * http://slideshow.hackyon.com
  */
 (function($) {
-// TODO: More transition functions
 // TODO: Resizable viewport
 // TODO: Do not block transitions to wait for img.onload()
 // TODO: Special fullscreen mode
@@ -62,16 +61,24 @@
           'overflow': 'hidden'
         });
         
+        var $inside = $('<div/>');
+        $inside.addClass('inside');
+        $inside.css({
+          'width':  width + 'px',
+          'height': height + 'px',
+          'overflow': 'hidden'
+        });
+        
         var $image = $('<img/>');
         $image.css({
           'width':  offsets.width  + 'px',
           'height': offsets.height + 'px',
-          'position': 'absolute',
-          'top':  -(y * this.boxHeight) + offsets.top  + 'px',
-          'left': -(x * this.boxWidth)  + offsets.left + 'px'
+          'margin-top':  -(y * this.boxHeight) + offsets.top  + 'px',
+          'margin-left': -(x * this.boxWidth)  + offsets.left + 'px'
         });
         $image.attr('src', src);
-        $box.append($image);
+        $inside.append($image);
+        $box.append($inside);
 
         grid[x][y] = $box;
         $container.append($box);
@@ -333,7 +340,7 @@
     var cols = viewportWidth  / this.boxWidth;
     var rows = viewportHeight / this.boxHeight;
 
-    var wait = (this.duration - 300) / (rows+1) / cols / 1000;
+    var wait = (this.duration - 300) / rows / (cols+1);
 
     var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
     grid.attach($viewport, $image, current);
@@ -344,16 +351,16 @@
 
     for (var x = 0; x < cols; x++) {
       for (var y = 0; y < rows; y++) {
-        var time = (y + rows * x) * wait;
+        var time = (y * cols + x) * wait;
         var $box = grid.boxes[x][y];
 
-        $box.css({
-          '-webkit-transition': 'all 0.3s linear',
-          //'transition': 'all 1s ease-out',
-        });
-        $box.css({
-          //'-webkit-transform': 'scale(0.75)',
-          'opacity': '0'
+        $box.delay(time).animate({ opacity: 0 }, {
+          step: function(now, fx) {
+            $(this).css({
+              '-webkit-transform': 'scale(' + (0.75 + 0.25 * now) + ')',
+            });
+          },
+          duration: 300
         });
       }
     }
@@ -363,6 +370,57 @@
       grid.destroy();
     }, this.duration);
   };
+
+  var ShrinkingCirclesTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  ShrinkingCirclesTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  ShrinkingCirclesTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+    var viewportWidth  = $viewport.width();
+    var viewportHeight = $viewport.height();
+
+    var cols = viewportWidth  / this.boxWidth;
+    var rows = viewportHeight / this.boxHeight;
+
+    var wait = (this.duration - 300) / rows / (cols+1);
+
+    var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
+    grid.attach($viewport, $image, current);
+
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
+
+    var radius = 4 * Math.max(this.boxHeight, this.boxWidth);
+
+    for (var x = 0; x < cols; x++) {
+      for (var y = 0; y < rows; y++) {
+        var time = (y * cols + x) * wait;
+        var $box = grid.boxes[x][y];
+        var $inside = $box.find('.inside');
+
+        $inside.delay(time).animate({ 
+          'border-radius': radius,
+          'margin-top': this.boxHeight/2,
+          'margin-left': this.boxWidth/2,
+          'width': '0',
+          'height': '0'
+        }, 300);
+      }
+    }
+
+    setTimeout(function() {
+      // Destroy the grid after the transition
+      grid.destroy();
+    }, this.duration);
+  };
+
 
   var DissolveTransition = function(config, duration) {
     this.boxWidth   = config.boxWidth;
@@ -604,23 +662,22 @@
         'FadingColumns':    new FadingColumnsTransition(config),
         'StripsBiHorizontal': new StripsBiHorizontalTransition(config),
         'StripsVertical': new StripsVerticalTransition(config),
-        'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
         'Dissolve': new DissolveTransition(config),
         'SlideLeft': new SlideLeftTransition(config),
-        //'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
-        //'ShrinkingCircles': new ShrinkingCirclesTransition(config),
-        'RotatingCircles': new RotatingCirclesTransition(config),
+        'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
+        'ShrinkingCircles': new ShrinkingCirclesTransition(config),
+        //'RotatingCircles': new RotatingCirclesTransition(config),
         //'Blinds': new BlindsTransition(config),
         //'SlideGradient': new SlideGradientTransition(config)
       };
       var activeTransitions = [ 
-        'FadingColumns', 
+        //'FadingColumns', 
         //'StripsBiHorizontal',
         //'StripsVertical',
         //'Dissolve',
         //'SlideLeft',
-        // TODO: 'ShrinkingBlocks', 
-        // TODO: 'ShrinkingCircles',
+        //'ShrinkingBlocks', 
+        'ShrinkingCircles',
         // TODO: 'RotatingCircles',
         // TODO: 'Blinds' (need CSS technique?)
         // TODO: 'SlideGradient',
