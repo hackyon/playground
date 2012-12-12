@@ -97,9 +97,8 @@
     this.boxes = null;
   };
 
-  var Circles = function(thickness, background) {
+  var Circles = function(thickness) {
     this.thickness = thickness;
-    this.background = background || 'transparent';
   }
 
   Circles.prototype.attach = function($viewport, $image, src) {
@@ -138,7 +137,7 @@
         'z-index': (n-i+1),
         'top':  (centerY - dimension/2) + 'px',
         'left': (centerX - dimension/2)  + 'px',
-        'background': this.background,
+        'background': 'transparent',
         'overflow': 'hidden'
       });
 
@@ -505,7 +504,7 @@
     return this.duration;
   };
   RotatingCirclesTransition.prototype.run = function($viewport, $image, offsets, current, next) {
-    var circles = new Circles(this.circleThickness, this.background);
+    var circles = new Circles(this.circleThickness);
     circles.attach($viewport, $image, current);
     
     setTimeout(function() {
@@ -707,13 +706,13 @@
         //'SlideGradient': new SlideGradientTransition(config)
       };
       var activeTransitions = [ 
-        //'FadingColumns', 
-        //'StripsBiHorizontal',
-        //'StripsVertical',
-        //'Dissolve',
-        //'SlideLeft',
-        //'ShrinkingBlocks', 
-        //'ShrinkingCircles',
+        'FadingColumns', 
+        'StripsBiHorizontal',
+        'StripsVertical',
+        'Dissolve',
+        'SlideLeft',
+        'ShrinkingBlocks', 
+        'ShrinkingCircles',
         'RotatingCircles',
         // TODO: 'Blinds' (need CSS technique?)
         // TODO: 'SlideGradient',

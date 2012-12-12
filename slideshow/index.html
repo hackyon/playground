@@ -73,9 +73,11 @@ html, body {
   float: left;
   width: 60px;
   height: 60px;
+  opacity: 0.7;
 }
 #thumbnails li.selected {
   border: 1px solid #aaa;
+  opacity: 1;
 }
 #thumbnails li:hover {
   border: 1px solid #aaa;
@@ -160,7 +162,7 @@ a:hover {
       <p class="tagline">Fancy slideshow for your images (jQuery plugin), available freely under the MIT License.</p>
     </div>
     <ul id="thumbnails">
-      <li><a href="images/originals/1.jpg" data-transition="StripsHorizontal"><img src="images/thumbnails/1.jpg"/></a></li>
+      <li><a href="images/originals/1.jpg" data-transition="StripsBiHorizontal"><img src="images/thumbnails/1.jpg"/></a></li>
       <li><a href="images/originals/2.jpg"><img src="images/thumbnails/2.jpg"/></a></li>
       <li><a href="images/originals/3.jpg"><img src="images/thumbnails/3.jpg"/></a></li>
       <li><a href="images/originals/4.jpg"><img src="images/thumbnails/4.jpg"/></a></li>
@@ -186,6 +188,7 @@ a:hover {
   <script>
     var $progress = $("#progress");
     $("#slideshow").slideshow({
+      overflow: 'crop',
       $thumbnails: $('#thumbnails'),
       progress: function(percent) {
         $progress.css('width', percent + "%");
