@@ -10,7 +10,6 @@
 // TODO: Resizable viewport
 // TODO: Do not block transitions to wait for img.onload()
 // TODO: Special fullscreen mode
-// BUG: Cropping resizes images and may cause 1-2 pixel(s) deviation for grid
 
   var Grid = function(boxWidth, boxHeight, background) {
     this.boxWidth  = boxWidth;
@@ -513,20 +512,23 @@
       $image.css(offsets).attr('src', next);
     }, 0);
 
+    var createStep = function(sign) {
+      return function(now, fx) {
+        $(this).css({
+          '-webkit-transform': 'rotate(' + (sign * (1-now) * 45) + 'deg)'
+        });
+      };
+    };
+
     for (var i = 0; i < circles.n; i++) {
       var $circle = circles.rings[i];
-      var sign = (i%2 === 0)? 1 : -1;
+      var sign  = (i%2 === 0)? 1 : -1;
+      var delay = (1-i/circles.n) * 700;
 
-      (function(duration, sign) {
-        $circle.animate({ opacity: 0 }, {
-          duration: duration,
-          step: function(now, fx) {
-            $(this).css({
-              '-webkit-transform': 'rotate(' + (sign * (1-now) * 45) + 'deg)'
-            });
-          }
-        });
-      })(this.duration, sign);
+      $circle.delay(delay).animate({ opacity: 0 }, {
+        duration: 300,
+        step: createStep(sign)
+      });
     }
 
     setTimeout(function() {
