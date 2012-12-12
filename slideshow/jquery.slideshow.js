@@ -326,6 +326,52 @@
     }
   };
 
+  var BlindsTransition = function(config, duration) {
+    this.boxWidth   = config.boxWidth;
+    this.boxHeight  = config.boxHeight;
+    this.background = config.background;
+
+    this.duration = duration || 1000;
+  };
+  BlindsTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  BlindsTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+    var viewportWidth  = $viewport.width();
+    var viewportHeight = $viewport.height();
+
+    var cols = viewportWidth  / this.boxWidth;
+    var rows = viewportHeight / this.boxHeight;
+
+    var grid = new Grid(this.boxWidth, this.boxHeight, this.background);
+    grid.attach($viewport, $image, current);
+
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
+
+    var counter = 0;
+    for (var x = 0; x < cols; x++) {
+      for (var y = 0; y < rows; y++) {
+        var $box = grid.boxes[x][y];
+
+        $box.animate({ 'text-indent': 90 }, {
+          step: function(now, fx) {
+            $(this).css({
+              '-webkit-transform': 'rotateY(' + now + 'deg)',
+            });
+          },
+          duration: this.duration
+        });
+      }
+    }
+
+    setTimeout(function() {
+      // Destroy the grid after the transition
+      grid.destroy();
+    }, this.duration);
+  };
+
   var ShrinkingBlocksTransition = function(config, duration) {
     this.boxWidth   = config.boxWidth;
     this.boxHeight  = config.boxHeight;
@@ -702,7 +748,7 @@
         'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
         'ShrinkingCircles': new ShrinkingCirclesTransition(config),
         'RotatingCircles': new RotatingCirclesTransition(config),
-        //'Blinds': new BlindsTransition(config),
+        'Blinds': new BlindsTransition(config),
         //'SlideGradient': new SlideGradientTransition(config)
       };
       var activeTransitions = [ 
@@ -714,7 +760,7 @@
         'ShrinkingBlocks', 
         'ShrinkingCircles',
         'RotatingCircles',
-        // TODO: 'Blinds' (need CSS technique?)
+        'Blinds',
         // TODO: 'SlideGradient',
       ];
 
