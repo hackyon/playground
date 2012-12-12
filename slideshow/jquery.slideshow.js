@@ -98,14 +98,17 @@
     this.boxes = null;
   };
 
-  var CircularGrid = function(width, background) {
-    this.width = width;
+  var Circles = function(thickness, background) {
+    this.thickness = thickness;
     this.background = background || 'transparent';
   }
 
-  CircularGrid.prototype.attach = function($viewport, $image, src) {
-    var rows = $viewport.height() / this.boxHeight;
-    var cols = $viewport.width()  / this.boxWidth;
+  Circles.prototype.attach = function($viewport, $image, src) {
+    var viewportWidth  = $viewport.width();
+    var viewportHeight = $viewport.height();
+
+    var diagonal = Math.sqrt(Math.pow(viewportWidth/2, 2) + Math.pow(viewportHeight/2, 2));
+    var n = Math.ceil(diagonal / this.thickness);
 
     var offsets = {
       'left': parseInt($image.css('left')),
@@ -120,59 +123,61 @@
       'z-index': '2'
     });
 
-    var grid = [];
-    for (var x = 0; x < cols; x++) {
-      grid[x] = [];
+    var centerX = viewportWidth  / 2;
+    var centerY = viewportHeight / 2;
 
-      var width  = this.boxWidth;
-      if (x+1 > cols) {
-        width = $viewport.width() % this.boxWidth;
-      }
-      for (var y = 0; y < rows; y++) {
-        var $box = $('<div/>');
+    var rings = [];
+    for (var i = 1; i <= n; i++) {
+      var dimension = this.thickness * i * 2;
 
-        var height = this.boxHeight;
-        if (y+1 > rows) {
-          height = $viewport.height() % this.boxHeight;
-        }
+      var $ring = $('<div/>');
 
-        $box.css({
-          'width':  width  + 'px',
-          'height': height + 'px',
-          'position': 'absolute',
-          'top':  (y * this.boxHeight) + 'px',
-          'left': (x * this.boxWidth)  + 'px',
-          'background': this.background,
-          'overflow': 'hidden'
-        });
-        
-        var $image = $('<img/>');
-        $image.css({
-          'width':  offsets.width  + 'px',
-          'height': offsets.height + 'px',
-          'position': 'absolute',
-          'top':  -(y * this.boxHeight) + offsets.top  + 'px',
-          'left': -(x * this.boxWidth)  + offsets.left + 'px'
-        });
-        $image.attr('src', src);
-        $box.append($image);
+      $ring.css({
+        'width':  dimension + 'px',
+        'height': dimension + 'px',
+        'position': 'absolute',
+        'z-index': (n-i+1),
+        'top':  (centerY - dimension/2) + 'px',
+        'left': (centerX - dimension/2)  + 'px',
+        'background': this.background,
+        'overflow': 'hidden'
+      });
 
-        grid[x][y] = $box;
-        $container.append($box);
-      }
+      var $inside = $('<div/>');
+      $inside.addClass('inside');
+      $inside.css({
+        'width':  dimension + 'px',
+        'height': dimension + 'px',
+        'border-radius': '9999px',
+        'overflow': 'hidden'
+      });
+      
+      var $image = $('<img/>');
+      $image.css({
+        'width':  offsets.width  + 'px',
+        'height': offsets.height + 'px',
+        'margin-top':  -(centerY - dimension/2) + offsets.top  + 'px',
+        'margin-left': -(centerX - dimension/2) + offsets.left + 'px'
+      });
+      $image.attr('src', src);
+      $inside.append($image);
+      $ring.append($inside);
+
+      rings.push($ring);
+      $container.append($ring);
     }
     
     $viewport.append($container);
 
-    this.boxes = grid;
-    this.n = cols * rows;
+    this.rings = rings;
+    this.n = n;
     this.src = src;
     this.$container = $container;
     this.$viewport = $viewport;
   };
-  CircularGrid.prototype.destroy = function() {
+  Circles.prototype.destroy = function() {
     this.$container.remove();
-    this.boxes = null;
+    this.rings = null;
   };
  
 
@@ -358,6 +363,9 @@
           step: function(now, fx) {
             $(this).css({
               '-webkit-transform': 'scale(' + (0.75 + 0.25 * now) + ')',
+              '-moz-transform':    'scale(' + (0.75 + 0.25 * now) + ')',
+              '-o-transform':      'scale(' + (0.75 + 0.25 * now) + ')',
+              'transform':         'scale(' + (0.75 + 0.25 * now) + ')',
             });
           },
           duration: 300
@@ -489,8 +497,7 @@
   };
 
   var RotatingCirclesTransition = function(config, duration) {
-    this.boxWidth   = config.boxWidth;
-    this.boxHeight  = config.boxHeight;
+    this.circleThickness = config.circleThickness;
     this.background = config.background;
 
     this.duration = duration || 1000;
@@ -499,7 +506,33 @@
     return this.duration;
   };
   RotatingCirclesTransition.prototype.run = function($viewport, $image, offsets, current, next) {
-    // Define "circular" grid
+    var circles = new Circles(this.circleThickness, this.background);
+    circles.attach($viewport, $image, current);
+    
+    setTimeout(function() {
+      $image.css(offsets).attr('src', next);
+    }, 0);
+
+    for (var i = 0; i < circles.n; i++) {
+      var $circle = circles.rings[i];
+      var sign = (i%2 === 0)? 1 : -1;
+
+      (function(duration, sign) {
+        $circle.animate({ opacity: 0 }, {
+          duration: duration,
+          step: function(now, fx) {
+            $(this).css({
+              '-webkit-transform': 'rotate(' + (sign * (1-now) * 45) + 'deg)'
+            });
+          }
+        });
+      })(this.duration, sign);
+    }
+
+    setTimeout(function() {
+      // Destroy the grid after the transition
+      circles.destroy();
+    }, this.duration);
   };
 
 
@@ -652,6 +685,7 @@
         time: 3000,
         boxWidth: 50,
         boxHeight: 50,
+        circleThickness: 50,
         overflow: 'original',
         progress: null,
         $thumbnails: null
@@ -666,7 +700,7 @@
         'SlideLeft': new SlideLeftTransition(config),
         'ShrinkingBlocks': new ShrinkingBlocksTransition(config),
         'ShrinkingCircles': new ShrinkingCirclesTransition(config),
-        //'RotatingCircles': new RotatingCirclesTransition(config),
+        'RotatingCircles': new RotatingCirclesTransition(config),
         //'Blinds': new BlindsTransition(config),
         //'SlideGradient': new SlideGradientTransition(config)
       };
@@ -677,8 +711,8 @@
         //'Dissolve',
         //'SlideLeft',
         //'ShrinkingBlocks', 
-        'ShrinkingCircles',
-        // TODO: 'RotatingCircles',
+        //'ShrinkingCircles',
+        'RotatingCircles',
         // TODO: 'Blinds' (need CSS technique?)
         // TODO: 'SlideGradient',
       ];
