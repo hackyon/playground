@@ -359,6 +359,9 @@
           step: function(now, fx) {
             $(this).css({
               '-webkit-transform': 'rotateY(' + now + 'deg)',
+              '-moz-transform':    'rotateY(' + now + 'deg)',
+              '-o-transform':      'rotateY(' + now + 'deg)',
+              'transform':         'rotateY(' + now + 'deg)'
             });
           },
           duration: this.duration
@@ -409,7 +412,7 @@
               '-webkit-transform': 'scale(' + (0.75 + 0.25 * now) + ')',
               '-moz-transform':    'scale(' + (0.75 + 0.25 * now) + ')',
               '-o-transform':      'scale(' + (0.75 + 0.25 * now) + ')',
-              'transform':         'scale(' + (0.75 + 0.25 * now) + ')',
+              'transform':         'scale(' + (0.75 + 0.25 * now) + ')'
             });
           },
           duration: 300
@@ -560,7 +563,10 @@
     var createStep = function(sign) {
       return function(now, fx) {
         $(this).css({
-          '-webkit-transform': 'rotate(' + (sign * (1-now) * 45) + 'deg)'
+          '-webkit-transform': 'rotate(' + (sign * (1-now) * 45) + 'deg)',
+          '-moz-transform':    'rotate(' + (sign * (1-now) * 45) + 'deg)',
+          '-o-transform':      'rotate(' + (sign * (1-now) * 45) + 'deg)',
+          'transform':         'rotate(' + (sign * (1-now) * 45) + 'deg)'
         });
       };
     };
