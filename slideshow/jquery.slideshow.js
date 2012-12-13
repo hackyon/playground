@@ -478,17 +478,13 @@
 
 
   var DissolveTransition = function(config, duration) {
-    this.boxWidth   = config.boxWidth;
-    this.boxHeight  = config.boxHeight;
     this.background = config.background;
-
     this.duration = duration || 1000;
   };
   DissolveTransition.prototype.computeDuration = function($viewport, $image) {
     return this.duration;
   };
   DissolveTransition.prototype.run = function($viewport, $image, offsets, current, next) {
-
     var $back = $('<img/>');
     $back.attr('src', next);
     $back.css({
@@ -503,17 +499,13 @@
   };
 
   var SlideLeftTransition = function(config, duration) {
-    this.boxWidth   = config.boxWidth;
-    this.boxHeight  = config.boxHeight;
     this.background = config.background;
-
     this.duration = duration || 1000;
   };
   SlideLeftTransition.prototype.computeDuration = function($viewport, $image) {
     return this.duration;
   };
   SlideLeftTransition.prototype.run = function($viewport, $image, offsets, current, next) {
-
     var $slide = $('<div/>');
     $slide.css({
       'position': 'absolute',
@@ -586,6 +578,43 @@
       // Destroy the grid after the transition
       circles.destroy();
     }, this.duration);
+  };
+
+  var SlideGradientTransition = function(config, duration) {
+    this.background = config.background;
+    this.duration = duration || 1000;
+  };
+  SlideGradientTransition.prototype.computeDuration = function($viewport, $image) {
+    return this.duration;
+  };
+  SlideGradientTransition.prototype.run = function($viewport, $image, offsets, current, next) {
+    var $front = $('<img/>');
+    $front.attr('src', current);
+    $front.css({
+      'position': 'absolute',
+      'z-index': 2,
+      'left': parseInt($image.css('left')),
+      'top':  parseInt($image.css('top')),
+      'width':  parseInt($image.css('width')), 
+      'height': parseInt($image.css('height'))
+    });
+
+    $image.css(offsets).attr('src', next);
+
+    $viewport.append($front);
+    $front.animate({ 'text-indent': 100 }, {
+      step: function(now, fx) {
+        $(this).css({
+          '-webkit-mask-position': '0 0',
+          '-webkit-mask-size': '100% 100%',
+          '-webkit-mask-image': '-webkit-linear-gradient(left, rgba(0,0,0,0) ' + (now-5) + '%, rgba(0,0,0,1) ' + (now+5) + '%)'
+        });
+      },
+      duration: this.duration,
+      complete: function() {
+        $front.remove();
+      }
+    });
   };
 
 
@@ -755,7 +784,7 @@
         'ShrinkingCircles': new ShrinkingCirclesTransition(config),
         'RotatingCircles': new RotatingCirclesTransition(config),
         'Blinds': new BlindsTransition(config),
-        //'SlideGradient': new SlideGradientTransition(config)
+        'SlideGradient': new SlideGradientTransition(config)
       };
       var activeTransitions = [ 
         'FadingColumns', 
@@ -767,7 +796,7 @@
         'ShrinkingCircles',
         'RotatingCircles',
         'Blinds',
-        // TODO: 'SlideGradient',
+        'SlideGradient'
       ];
 
       return this.each(function() {
