@@ -5,3 +5,6 @@
   var Context = function() {
   };
 
+  var clamp = function(value) {
+    return Math.min(255, Math.max(0, value));
+  };

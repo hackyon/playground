@@ -12,9 +12,9 @@ ContrastFilter.prototype.render = function(imageData) {
     var g = imageData.data[i+1];
     var b = imageData.data[i+2];
 
-    imageData.data[i]   = (r - 128) * this.multiplier + 128;
-    imageData.data[i+1] = (g - 128) * this.multiplier + 128;
-    imageData.data[i+2] = (b - 128) * this.multiplier + 128;
+    imageData.data[i]   = clamp((r - 128) * this.multiplier + 128);
+    imageData.data[i+1] = clamp((g - 128) * this.multiplier + 128);
+    imageData.data[i+2] = clamp((b - 128) * this.multiplier + 128);
   }
   this._next(imageData);
 };
