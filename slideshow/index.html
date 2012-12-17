@@ -14,7 +14,7 @@ html, body {
 }
 #container {
   position: fixed;
-  width: 400px;
+  width: 65%;
   height: 100%;
   overflow: hidden;
   z-index: 1;
@@ -37,7 +37,7 @@ html, body {
 
 /* Viewport */
 #slideshow {  
-  width: 400px;
+  width: 100%;
   height: 100%;
 }
 #slideshow .viewport {
@@ -62,7 +62,7 @@ html, body {
 /* Thumbnails */
 #thumbnails {
   list-style: none;
-  margin: 30px 0 0 0;
+  margin: 30px 30px 0 30px;
   padding: 0;
 }
 #thumbnails li {
@@ -92,13 +92,17 @@ html, body {
 
 /* Content */
 #content {
-  float: left;
-  margin: 0 0 0 400px;
-  padding: 0 30px;
+  float: right;
+  margin: 0;
+  padding: 0;
   display: block;
+  width: 35%;
   height: 100%;
   color: #777;
   z-index: 2;
+}
+#header {
+  margin: 0 30px;
 }
 h1 {
   margin: 50px 0 0 1px;
@@ -114,20 +118,26 @@ h1 em {
   font-style: normal;
 }
 p.tagline {
-  width: 300px;
+  max-width: 300px;
   margin: 7px 0;
 }
 
 #footer {
-  border-top: 1px solid #222;
-  margin: 70px 0 0 0;
-  padding: 5px 0 50px 0;
-  color: #333;
+  position: absolute;
+  width: 35%;
+  bottom: 0;
+  color: #555;
   font-size: 10px;
+  line-height: 12px;
   text-transform: uppercase;
 }
+#footer .inside {
+  border-top: 1px solid #1e1e1e;
+  margin: 10px 30px;
+  padding: 7px 0;
+}
 #footer p {
-  margin: 2px 0;
+  margin: 0;
 }
 #footer a {
   color: #555;
@@ -138,7 +148,11 @@ p.tagline {
 #badassdon {
   position: relative;
   top: 2px;
-  left: 3px;
+  left: 2px;
+  opacity: 0.5;
+}
+#badassdon:hover {
+  opacity: 1;
 }
 
 .clear {
@@ -170,8 +184,10 @@ a:hover {
     </ul>
     <div class="clear"></div>
     <div id="footer">
-      <p>Photos are copyrighted (c).</p>
-      <p>Made by <a href="http://www.badassdon.com" id="badassdon" target="_blank"><img src="images/badassdon.png" width="15" height="15"></a></p>
+      <div class="inside">
+        <p>Photos are copyrighted (c) 2012.</p>
+        <p>Designed, developed, and photographed by <a href="http://www.badassdon.com" id="badassdon" target="_blank"><img src="images/badassdon.png" width="15" height="15"></a></p>
+      </div>
     </div>
   </div>
   <div id="container">
