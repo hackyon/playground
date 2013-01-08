@@ -9,7 +9,7 @@
 var page   = require('webpage').create()
   , system = require('system');
 
-if (system.args.length === 1) {
+if (system.args.length !== 2) {
   console.log('Usage: phantomjs inliner.js <file>');
   phantom.exit();
 }
