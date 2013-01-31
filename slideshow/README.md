@@ -1,11 +1,11 @@
-[jQuery-Slideshow](http://www.hackyon.com/playground/slideshow/)
+[jQuery-Slideshow](http://www.hackyon.com/playground/slideshow/) - Open Source Slideshow for jQuery
 ==================
 
-A jQuery plugin for an image slideshow. Experimenting with the transition effects available in similar slideshows libraries. The plugin comes with 10 transition. Feel free to implement your own as the source is freely available under the MIT license.
+A jQuery plugin for an image slideshow. Experimenting with the transition effects available in similar slideshow libraries. The plugin comes with 10 transition. Feel free to implement your own as the source is freely available under the MIT license.
 
 
-Instructions
--------------------
+Getting Started
+-----------------------------
 
 Include the required jQuery (>1.8.2) dependency
 
@@ -47,8 +47,13 @@ Use the thumbnails list to configure the images in the slideshow. The full-size 
 The ```data-transition``` attribute may be used to force the use of a specific transition (when transitioning to that particular image).
 
 
+Contributions
+-----------------------------
+Contributions and suggestions are welcomed. I will promote this library to its own repo if others are interested in contributing (so please let me know if you're interested). 
+
+
 License
--------------------
+-----------------------------
 The source is freely available under the terms of the MIT License.  
 
 Feel free to download, modify, and use for personal or commercial projects. I would appreciate a pingback if you find the project useful, but it's certainly not required.
