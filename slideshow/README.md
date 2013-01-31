@@ -1,21 +1,20 @@
 [jQuery-Slideshow](http://www.hackyon.com/playground/slideshow/)
 ==================
 
-A jQuery plugin for an image slideshow. Experimenting with the transition effects available in similar slideshows libraries. 
-
-The plugin comes with 10 transition. Feel free to implement your own as the source is freely available under the MIT license.
+A jQuery plugin for an image slideshow. Experimenting with the transition effects available in similar slideshows libraries. The plugin comes with 10 transition. Feel free to implement your own as the source is freely available under the MIT license.
 
 
 Instructions
 -------------------
 
-1. Include the required jQuery (>1.8.2) dependency
+Include the required jQuery (>1.8.2) dependency
 
-```
+```html
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="jquery.slideshow.js"></script>
 ``` 
 
-2. Initialize the slideshow
+Initialize the slideshow
 
 ```javascript
 $("#slideshow").slideshow({
@@ -33,7 +32,7 @@ $("#container").mouseover(function() {
 });
 ```
 
-3. Use the thumbnail list to configure the images in the slideshow. The full size image shown in the slideshow is fetched from the corresponding ```href``` attribute. 
+Use the thumbnails list to configure the images in the slideshow. The full-size image shown in the slideshow is fetched from the corresponding ```href``` attribute. 
 
 ```html
 <ul id="thumbnails">
