@@ -1,4 +1,4 @@
-[Mercator Projections](http://www.hackyon.com/playground/mercator/)
+[Mercator Projections](http://www.hackyon.com/playground/mercator/) and Long/Lat
 ======================
 
 Experimenting with [Meractor projections](http://en.wikipedia.org/wiki/Mercator_projection). Long/Lat coordinates are translated to their corresponding x and y coordinates using the [Gudermannian function](http://en.wikipedia.org/wiki/Gudermannian_function).
