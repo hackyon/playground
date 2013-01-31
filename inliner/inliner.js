@@ -1,6 +1,6 @@
 /**
  * Inlines the styles from the stylesheets into their corresponding
- * DOM elements. The most obvious use case is sending HTML emails,
+ * DOM elements. The most obvious use case is sending HTML emails 
  * (because email clients tend to remove all the non-inline styles).
  * 
  * PhantomJS (phantomjs.org) is used to parse and manipulate the DOM.

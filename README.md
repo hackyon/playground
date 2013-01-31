@@ -1,9 +1,9 @@
 Playground | [badassdon](http://www.badassdon.com)
 ==================================================
 
-For experiments, hackathons, and various smaller projects.
+For experiments, hackathons, and other small projects.
 
-This is where all young experiments go before they grow up and deserve their own repo. Each subdirectory has its own README.md description, so click on them to learn more. 
+This is where all young experiments go before they grow up and move out to their own repo. Each subdirectory has its own README.md description, so click on them to learn more. 
 
 
 ### Showcase

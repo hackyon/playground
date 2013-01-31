@@ -1,0 +1,57 @@
+[jQuery-Slideshow](http://www.hackyon.com/playground/slideshow/)
+==================
+
+A jQuery plugin for an image slideshow. Experimenting with the transition effects available in similar slideshows libraries. 
+
+The plugin comes with 10 transition. Feel free to implement your own as the source is freely available under the MIT license.
+
+
+Instructions
+-------------------
+
+1. Include the required jQuery (>1.8.2) dependency
+
+```
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+``` 
+
+2. Initialize the slideshow
+
+```javascript
+$("#slideshow").slideshow({
+  overflow: 'crop',                   // Original, crop, or pad
+  $thumbnails: $('#thumbnails'),      // Specifies the slideshow images
+  progress: function(percent) {       // Progress listener
+    $progress.css('width', percent + "%"); 
+  }
+});
+
+$("#container").mouseover(function() {
+  $("#slideshow").slideshow('pause'); // Pauses the slideshow
+}).mouseout(function() {
+  $("#slideshow").slideshow('start'); // Resumes the slideshow
+});
+```
+
+3. Use the thumbnail list to configure the images in the slideshow. The full size image shown in the slideshow is fetched from the corresponding ```href``` attribute. 
+
+```html
+<ul id="thumbnails">
+  <li><a href="images/originals/1.jpg" data-transition="StripsBiHorizontal"><img src="images/thumbnails/1.jpg"/></a></li>
+  <li><a href="images/originals/2.jpg"><img src="images/thumbnails/2.jpg"/></a></li>
+  <li><a href="images/originals/3.jpg"><img src="images/thumbnails/3.jpg"/></a></li>
+  <li><a href="images/originals/4.jpg"><img src="images/thumbnails/4.jpg"/></a></li>
+  <li><a href="images/originals/5.jpg"><img src="images/thumbnails/5.jpg"/></a></li>
+</ul>
+```
+
+The ```data-transition``` attribute may be used to force the use of a specific transition (when transitioning to that particular image).
+
+
+License
+-------------------
+The source is freely available under the terms of the MIT License.  
+
+Feel free to download, modify, and use for personal or commercial projects. I would appreciate a pingback if you find the project useful, but it's certainly not required.
+
+

@@ -1,8 +1,8 @@
 /**
  * jQuery-Slideshow v0.1.0
  *
- * Image slideshow with pluggable transition effects.Distributed under the 
- * terms of the MIT License.
+ * Image slideshow with pluggable transition effects. Distributed under 
+ * the terms of the MIT License.
  *
  * http://slideshow.hackyon.com
  */
