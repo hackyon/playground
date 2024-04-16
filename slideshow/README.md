@@ -1,4 +1,4 @@
-[jQuery-Slideshow](http://www.hackyon.com/playground/slideshow/) - Open Source Slideshow for jQuery
+[jQuery-Slideshow](https://hackyon.github.io/playground/slideshow/) - Open Source Slideshow for jQuery
 ==================
 
 A jQuery plugin for an image slideshow. Experimenting with the transition effects available in similar slideshow libraries. The plugin comes with 10 transition. Feel free to implement your own as the source is freely available under the MIT license.
@@ -10,7 +10,7 @@ Getting Started
 Include the required jQuery (>1.8.2) dependency
 
 ```html
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script type="text/javascript" src="jquery.slideshow.js"></script>
 ``` 
 
@@ -24,9 +24,7 @@ $("#slideshow").slideshow({
     $progress.css('width', percent + "%"); 
   }
 });
-
-$("#container").mouseover(function() {
-  $("#slideshow").slideshow('pause'); // Pauses the slideshow
+$("#container").mouseover(function() { $("#slideshow").slideshow('pause'); // Pauses the slideshow
 }).mouseout(function() {
   $("#slideshow").slideshow('start'); // Resumes the slideshow
 });

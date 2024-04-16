@@ -1,4 +1,4 @@
-[Homing Hearts](http://www.hackyon.com/playground/missile/) - Basic Homing Experiment
+[Homing Hearts](https://hackyon.github.io/playground/missile/) - Basic Homing Experiment
 =========================
 
 Experimented with a very basic implementation of homing missiles, but ended up with something pretty fun to look at after playing around with the design. Requires efficient SVG and so is best viewed on WebKit browsers.

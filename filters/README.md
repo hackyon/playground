@@ -1,9 +1,9 @@
-[JS Image Filters](http://www.hackyon.com/playground/filters/) on HTML5 Canvas
+[JS Image Filters](https://hackyon.github.io/playground/filters/) on HTML5 Canvas
 ==================
 
 JavaScript implementations of image filters (Hue, Saturation, Contrast, etc.) by manipulating pixel data on a HTML5 canvas. The filters are applied by rendering images onto a "source" canvas and forwarding the image data through a filter pipeline. There are some plans to port this project as a polyfill for CSS3 filters.
 
-The project is built and packaged using [Grunt](http://gruntjs.com/).
+The project is built and packaged using [Grunt](https://gruntjs.com/).
 
 ### List of Filters
 
@@ -25,5 +25,4 @@ The project is built and packaged using [Grunt](http://gruntjs.com/).
 * Image Histogram
 
 
-
-A small jQuery plugin called HoverScroll (```lib/jquery.hoverscroll.js```) is also included. This plugin scrolls a list of images horizontally as you move the mouse left and right over the images. Check out the [demo](http://www.hackyon.com/playground/filters/).
+A small jQuery plugin called HoverScroll (```lib/jquery.hoverscroll.js```) is also included. This plugin scrolls a list of images horizontally as you move the mouse left and right over the images.

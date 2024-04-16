@@ -83,8 +83,8 @@
 </head>
 <body>
   <h1>The Y Combinator</h1>
-  <p>The first thing you get when you ask mother Google <a href="https://www.google.com/search?q=ycombinator" target="_blank">about the Y Combinator</a> is the infamous <a href="http://ycombinator.com" target="_blank">startup seed accelerator</a>. There are barely any results for the mathematical operator in which the startup accelerator takes its name.
-  <p>One of the <a href="http://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator" target="_blank">most convenient resources on the Y Combinator</a> (no surprises there) describes the Y Combinator as a particular fixed-point combinator that was discovered by our beloved <a href="http://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry</a>. The definition of a fixed-point combinator, <code>g</code>, is <code>g(f) = f(g(f))</code>. Notice how you can keep applying that equation to itself, yielding <code>g(f) = f(g(f)) = f(f(g(f))) = f(f(f(...)))</code>! In practice, a fixed-point combinator can be used to support anonymous recursive functions, allowing recursion to happen without binding functions to identifiers.</p>
+  <p>The first thing you get when you ask mother Google <a href="https://www.google.com/search?q=ycombinator" target="_blank">about the Y Combinator</a> is the infamous <a href="https://ycombinator.com" target="_blank">startup seed accelerator</a>. There are barely any results for the mathematical operator in which the startup accelerator takes its name.
+  <p>One of the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator#Y_combinator" target="_blank">most convenient resources on the Y Combinator</a> (no surprises there) describes the Y Combinator as a particular fixed-point combinator that was discovered by our beloved <a href="https://en.wikipedia.org/wiki/Haskell_Curry" target="_blank">Haskell Curry</a>. The definition of a fixed-point combinator, <code>g</code>, is <code>g(f) = f(g(f))</code>. Notice how you can keep applying that equation to itself, yielding <code>g(f) = f(g(f)) = f(f(g(f))) = f(f(f(...)))</code>! In practice, a fixed-point combinator can be used to support anonymous recursive functions, allowing recursion to happen without binding functions to identifiers.</p>
   
   <p>The Y Combinator is defined as <code>Y = λf.(λx.f (x x)) (λx.f (x x))</code>. The Javascript implementation of the Y Combinator on this page demonstrates how the factorial function can be defined without it ever having to reference itself:</p>
   <code><pre>
@@ -127,6 +127,5 @@
   </pre></code>
   </table>
   <p>The above implementation is in fact a slight variation of the Y Combinator called the Z Combinator, where <code>Z = λf.(λx.f (λv.((x x) v))) (λx.f (λv.((x x) v)))</code>. The Z Combinator is just like the Y Combinator, except an additional function is added to prevent the Y Combinator from evaluating until the resulting function is called ("Eta-Expansion").</p>
-  <p>Experiment by <a href="http://www.badassdon.com">Donald Lau</a>.</p>
 </body>
 </html>
