@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+
+<head>
+  <title>travelmap.</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:700|Open+Sans:300,700" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<div class="text-container">
+  <h1>travelmap.</h1>
+  <div class="divider"></div>
+
+  <div id="countries-list"></div>
+
+  <div id="countries-hovered">&nbsp;</div>
+  <span id="countries-count">0</span> countries and counting<br/>
+</div>
+
+<div id="map"></div>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/topojson.v1.min.js"></script>
+<script src="country_ids_to_names.js"></script>
+<script>
+
+var width  = window.innerWidth;
+var height = 0; // To be computed once bounds are available
+
+var projection = d3.geo.mercator().scale(1).translate([0,0]);
+var path = d3.geo.path().projection(projection);
+
+var svg = d3.select("#map")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var selectedCountries = {};
+
+d3.json("countries.geo.json", function(error, data) {
+  if (error) throw error;
+
+  var world = data.features;
+
+  // Populate the name in the data
+  world.forEach(function(country, j) {
+    country.name = countryIdToName[country.id]
+  });
+
+  // Scale to width of browser
+  var bounds = path.bounds(data);
+  var scale = 1 / ((bounds[1][0] - bounds[0][0]) / width);
+  
+  // Readjust height of map based on width
+  height = (bounds[1][1] - bounds[0][1]) * scale;
+  svg.attr("height", height);
+  d3.select("#map").attr("height", height);
+
+  var translation = [(width - scale * (bounds[1][0] + bounds[0][0])) / 2, 
+                     (height - scale * (bounds[1][1] + bounds[0][1])) / 2];
+
+  projection.scale(scale).translate(translation);
+
+  // Populate the world data
+  svg.selectAll("path")
+    .data(world).enter()
+    .append("path")
+    .attr("class", "land")
+    .attr("d", path)
+    .attr("id", function(country) { return "country-path-" + country.id; })
+    .on("mouseover", function(country, i) {
+      d3.select("#countries-hovered").text(country.name);
+    })
+    .on("mouseout", function(country, i) {
+      d3.select("#countries-hovered").html("&nbsp;");
+    })
+    .on("click", function(country, i) {
+
+        if (country.id in selectedCountries) {
+          delete selectedCountries[country.id];
+          d3.select(this).attr("class", "land");
+          d3.select("#country-list-" + country.id).remove();
+
+        } else {
+          selectedCountries[country.id] = true;
+          d3.select(this).attr("class", "land selected");
+          d3.select("#countries-list")
+            .insert("div",":first-child")
+            .attr("id", "country-list-" + country.id)
+            .text(country.name);
+        }
+
+        d3.select("#countries-count")
+          .text(Object.keys(selectedCountries).length);
+
+        var hash = "#" + Object.keys(selectedCountries).join();
+        if (history.pushState) {
+          history.pushState(null, null, hash);
+        } else {
+          location.hash = hash;
+        }
+
+        d3.event.stopPropagation();
+    });
+
+  // Repopulate countries based on URL hash value
+  var hash = window.location.hash.substr(1);
+  hash.split(",").forEach(function(id, i) {
+    if (!(id in countryIdToName)) return;
+    selectedCountries[id] = true;
+
+    d3.select("#country-path-" + id)
+      .attr("class", "land selected");
+
+    d3.select("#countries-list")
+      .append("div")
+      .attr("id", "country-list-" + id)
+      .text(countryIdToName[id]);
+
+    d3.select("#countries-count")
+      .text(Object.keys(selectedCountries).length);
+  });
+
+});
+
+</script>
+
+</body>
+</html>
