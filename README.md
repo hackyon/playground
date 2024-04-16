@@ -1,4 +1,4 @@
-Playground | [badassdon](http://www.badassdon.com)
+Playground
 ==================================================
 
 For experiments, hackathons, and other small projects.
@@ -13,5 +13,4 @@ This is where all young experiments go before they grow up and move out to their
 * [jQuery-Slideshow](http://www.hackyon.com/playground/slideshow) - A jQuery plugin for an image slideshow. Experimenting with the cool transition effects I have seen in similar slideshows libraries.
 * [Basic Homing Missiles](http://www.hackyon.com/playground/missile) - Experimented with a very basic implementation of homing missiles, but ended up with something pretty fun to look at after playing around with the design. Requires efficient SVG and so is best viewed on WebKit browsers. 
 
-Copyright (c) 2013 [Donald Lau](http://www.badassdon.com)
 
