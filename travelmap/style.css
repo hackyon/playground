@@ -30,7 +30,9 @@ h1 {
 
 #countries-list {
   max-height: 300px;
-  overflow: scroll;
+  min-width: 200px;
+  overflow-y: scroll;
+  overflow-x: clip;
   margin: 30px 0 20px 0;
 }
 
